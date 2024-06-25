@@ -22,7 +22,6 @@ public class Lexer {
     private int warningCount; // running total of warnings for a program
     private boolean foundEnd; // boolean to determine if weve hit an EOP
     private boolean foundNew; // boolean to determine if were starting a new program
-    private Parser myParser; // parser to be used for each program and reset accordingly
     
     //! Lexer default constructor
     public Lexer() {
@@ -35,7 +34,6 @@ public class Lexer {
         this.warningCount = 0;
         this.foundEnd = false;
         this.foundNew = true;
-        this.myParser = new Parser(); // instance of parser
 
     }
     
@@ -80,9 +78,6 @@ public class Lexer {
         this.warningCount = 0;
         this.foundNew = true;
         this.foundEnd = false;
-
-        // reset parser for each program
-        myParser.reset();
     }
 
     //! Start of Lexical Analysis (Scanner)
@@ -93,7 +88,7 @@ public class Lexer {
         // Define our Grammer to be used by regex pattern detection
         String ids = "[a-z]"; // regex a through z 
         String digits = "[0-9]+"; // regex 0 through 9
-        String chars = "[a-z0-9]+"; // regex one or more a through z and digits 0-9
+        String chars = "[a-z]+"; // regex one or more a through z NO DIGITS
         String keywords = "(print|while|if|int|string|boolean|true|false)"; // regex or
         String symbols = "(\\$|\\{|\\}|\\(|\\)|\\==|\\!=|\\=|\\+)"; // regex or
         String whiteSpace = "\s"; // regex whitespace
@@ -245,37 +240,10 @@ public class Lexer {
                 else if(match.group().matches(digits) && !inComment) {
                     tokenID = "T_DIGIT";
                     
-                    // if the digit exists in quote convert to individual digits as chars
+                    // if the digit exists in quote throw an error to prevent parsing errors later
                     if(inQuotes) {
-                        tokenID = "T_CHAR";
-
-                        // Split digit
-                        int digit = Integer.valueOf(myMatch);
-                        int currDigit = 0;
-                        String digitLength = Integer.toString(digit);
-                        String[] digitArr = new String[digitLength.length()];
-                        int arrPos = 0;
-                        
-                        // edge case if digit is a 0
-                        if(digit == 0) {
-                            digitArr[arrPos] = Integer.toString(digit);
-                        }
-
-                        // add each digit to our array
-                        while(digit != 0) {
-                            currDigit = digit % 10;
-                            digitArr[arrPos] = Integer.toString(currDigit);
-                            arrPos++;
-                            digit = digit / 10;
-                        }
-                        
-                        // read array backwards and create token for each digit
-                        for(int i = digitArr.length - 1; i >= 0; i--) {
-                            Token newDigitToken = new Token(tokenID, digitArr[i], lineNumber);
-                            myTokens.add(newDigitToken);
-                            System.out.println("LEXER --> | " + tokenID + " [ " + digitArr[i] + " ] on line " + (lineNumber + 1) + "...");
-                        }
-
+                        System.out.println("ERROR - UNAUTHORIZED DIGIT IN QUOTES [ " + myMatch + " ] at line " + (lineNumber +1) + "..." );
+                        this.errorCount++;
                     // if the digit is not in quotes add normally
                     } else {
                         // Create Token for digit
@@ -365,8 +333,8 @@ public class Lexer {
                 System.out.println("Lexical Anaylsis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
             }
 
-            // Send tokens to parser
-            myParser.tokenStream(this.myTokens);
+            // save to total tokens before reset
+            this.myTotalTokens.add(this.myTokens);
 
             // Reset Lexer for Next Program
             this.clearLexer();

@@ -1,0 +1,9 @@
+{}$
+{{{{{}}}}}$
+{{{{{{}}}}/* Ignored */}}$
+{/* comments ignored */} int @ }$
+{int a
+a = a
+string b
+a = b
+}$

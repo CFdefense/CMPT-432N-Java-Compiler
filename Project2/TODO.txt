@@ -1,0 +1,21 @@
+-- INSTRUCTIONS --
+Parser and CST
+
+Parser -> validates tokens
+
+While Parsing create a Concrete Syntax Tree (CST)
+
+if(parseSucess) {
+    print CST
+}
+
+Include Warnings and Errors
+
+if errors in lex do not parse
+
+-- TODO --
+
+be able to transmit to parser the tokens and if good or bad
+
+
+LOOK AT slide 137-198

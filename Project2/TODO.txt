@@ -16,6 +16,6 @@ if errors in lex do not parse
 -- TODO --
 
 be able to transmit to parser the tokens and if good or bad
-
+Flesh out each method and test CST
 
 LOOK AT slide 137-198

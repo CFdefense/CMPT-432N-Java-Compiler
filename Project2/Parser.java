@@ -8,10 +8,46 @@ import java.util.ArrayList;
 
 public class Parser {
     // Private Instance Variables
-    private ArrayList<Token> myTokens;
+    private ArrayList<Token> myTokens; // to store token stream
+    private String[] gramType; // to store acceptable types
+    private char[] gramChar; // to store acceptable chars
+    private char gramSpace; // to store acceptable space char
+    private int[] gramDigit; // to store acceptable digits
+    private String[] gramBoolOp; // to store acceptable bool op
+    private String[] gramBoolVal; // to store acceptable bool val
+    private char intOp; // to store acceptable int op
+
+    // Null Constructor
+    public Parser() {
+        // Initialize Private Variables
+        myTokens = new ArrayList<Token>();
+        gramType = new String[]{"int", "string", "boolean"};
+        gramChar = new char[26];
+        for (char c = 'a'; c <= 'z'; c++) {
+            gramChar[c - 'a'] = c; // using ASCII
+        }
+        gramSpace = ' ';
+        gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        gramBoolOp = new String[]{"==", "!="};
+        gramBoolVal = new String[]{"false", "true"};
+        intOp = '+';
+    }
+
+    //! Method to read in tokens to parser
+    public void tokenStream(ArrayList<Token> lexerTokens) {
+        // add each token from method call to parser tokens
+        for(Token currToken : lexerTokens) {
+            myTokens.add(currToken);
+        }
+    }
+
+    //! Method to reset parser in between program uses
+    public void reset() {
+        myTokens.clear(); // reset token arrayList
+    }
 
     public void parseProgram() {
-
+        
     }
 
     public void parseBlock() {
@@ -95,36 +131,6 @@ public class Parser {
     }
 
     public void parseIntOp() {
-        
+
     }
-
-
-
-
-    // Null Constructor
-    public Parser() {
-        myTokens = new ArrayList<Token>();
-    }
-
-
-
-
-
-
-
-
-
-    //! Method to read in tokens to parser
-    public void tokenStream(ArrayList<Token> lexerTokens) {
-        // add each token from method call to parser tokens
-        for(Token currToken : lexerTokens) {
-            myTokens.add(currToken);
-        }
-    }
-
-    //! Method to reset parser in between program uses
-    public void reset() {
-        myTokens.clear(); // reset token arrayList
-    }
-    
 }

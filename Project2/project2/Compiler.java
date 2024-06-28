@@ -1,6 +1,10 @@
 // Main File for Testing and Implementation of Compiler
 
+package project2;
+
 import java.util.Scanner;
+
+import project2.Lexer;
 
 public class Compiler {
 

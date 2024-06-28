@@ -4,6 +4,8 @@
     Perform lexical analysis on input programs and return an ordered stream of tokens
 */
 
+package project1;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;

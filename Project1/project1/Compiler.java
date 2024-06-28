@@ -1,5 +1,7 @@
 // Main File for Testing and Implementation of Compiler
 
+package project1;
+
 import java.util.Scanner;
 
 public class Compiler {

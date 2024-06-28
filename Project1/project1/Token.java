@@ -1,7 +1,9 @@
-    /*
-        Token Object to be generated from Lexical Anaylsis
-        Tokens hold a type, lexeme and the line in which they were read from.
-     */
+/*
+    Token Object to be generated from Lexical Anaylsis
+    Tokens hold a type, lexeme and the line in which they were read from.
+*/
+
+package project1;
 
 public class Token {
     

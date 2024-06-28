@@ -2,9 +2,13 @@
     Parser to take in stream of tokens and then validates them and their syntax
 
 
- */
+*/
+
+package project2;
 
 import java.util.ArrayList;
+
+import project2.Token;
 
 public class Parser {
     // Private Instance Variables

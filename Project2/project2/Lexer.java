@@ -4,6 +4,8 @@
     Perform lexical analysis on input programs and return an ordered stream of tokens
 */
 
+package project2;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
@@ -11,17 +13,20 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import project2.Token;
+
 public class Lexer {
     // Private Object Instance Variables
     private ArrayList<String> fileLines; // array to store each file line
     private ArrayList<Token> myTokens;  // array to store a single program tokens
-    private ArrayList<ArrayList<Token>> myTotalTokens; // 2D array to hold each programs tokens
+    private ArrayList<ArrayList<Token>> myTotalTokens; // 2D array to hold each programs tokens mainly used for debugging and program count
     private boolean inComment; // to determine if we are reading in a comment
     private boolean inQuotes; // to determin if we are reading in a quote
     private int errorCount; // running total of errors for a program
     private int warningCount; // running total of warnings for a program
     private boolean foundEnd; // boolean to determine if weve hit an EOP
     private boolean foundNew; // boolean to determine if were starting a new program
+    private Parser myParser;
     
     //! Lexer default constructor
     public Lexer() {
@@ -34,6 +39,7 @@ public class Lexer {
         this.warningCount = 0;
         this.foundEnd = false;
         this.foundNew = true;
+        this.myParser = new Parser();
 
     }
     
@@ -78,6 +84,7 @@ public class Lexer {
         this.warningCount = 0;
         this.foundNew = true;
         this.foundEnd = false;
+        this.myParser.reset();
     }
 
     //! Start of Lexical Analysis (Scanner)
@@ -329,8 +336,14 @@ public class Lexer {
             // output final conclusion
             if(this.errorCount > 0) {
                 System.out.println("Lexical Analysis Failed - Reached End of Program with "+ this.warningCount + " Warning(s) and " + this.errorCount + " Error(s) \n");
+                System.out.println("PARSER WILL NOT START DUE TO ERRORS \n");
             } else {
                 System.out.println("Lexical Anaylsis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
+                System.out.println("PARSER STARTING... \n");
+
+                // Send tokens to PARSER
+                myParser.tokenStream(myTokens);
+                
             }
 
             // save to total tokens before reset
@@ -361,9 +374,17 @@ public class Lexer {
         // output final conclusion
         if(this.errorCount > 0) {
             System.out.println("Lexical Analysis Failed - Reached End of Program with "+ this.warningCount + " Warning(s) and " + this.errorCount + " Error(s) \n");
+            System.out.println("PARSER WILL NOT START DUE THESE ERRORS \n");
         } else {
             System.out.println("Lexical Anaylsis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
+            System.out.println("PARSER STARTING... \n");
+
+            // Send Tokens to PARSER
+            myParser.tokenStream(myTokens);
         }
+
+        // Save Tokens
+        myTotalTokens.add(myTokens);
 
         // Reset Lexer for Next Program
         this.clearLexer();

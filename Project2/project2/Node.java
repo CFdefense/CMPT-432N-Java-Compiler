@@ -1,7 +1,10 @@
 /*
     Node class for CST to hold values of each node in the tree
     Parent - Contents - Children
- */
+*/
+
+package project2;
+
 import java.util.ArrayList;
 
 public class Node {

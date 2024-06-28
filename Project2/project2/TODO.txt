@@ -17,4 +17,4 @@ LOOK AT slide 137-198
 
 -- TODO --
 
-Flesh out each method and test CST <--!!!
+Flesh out each methods for Parser and test CST <--!!!

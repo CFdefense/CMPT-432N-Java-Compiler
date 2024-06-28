@@ -4,7 +4,6 @@ package project2;
 
 import java.util.Scanner;
 
-import project2.Lexer;
 
 public class Compiler {
 
@@ -31,6 +30,5 @@ public class Compiler {
         } else {
             System.out.println("File Failed to be Read - Lexical Anaylsis will not proceed.");
         }
-
     }
 }

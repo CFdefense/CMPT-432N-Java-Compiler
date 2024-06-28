@@ -5,17 +5,16 @@ Parser -> validates tokens
 
 While Parsing create a Concrete Syntax Tree (CST)
 
-if(parseSucess) {
-    print CST
+if(parseSucess) { <- in match
+    print CST <- write function
 }
 
-Include Warnings and Errors
+Include Warnings and Errors 
 
-if errors in lex do not parse
+if errors in lex do not parse DONE
+
+LOOK AT slide 137-198
 
 -- TODO --
 
-be able to transmit to parser the tokens and if good or bad
-Flesh out each method and test CST
-
-LOOK AT slide 137-198
+Flesh out each method and test CST <--!!!

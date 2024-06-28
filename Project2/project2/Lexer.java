@@ -13,8 +13,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import project2.Token;
-
 public class Lexer {
     // Private Object Instance Variables
     private ArrayList<String> fileLines; // array to store each file line

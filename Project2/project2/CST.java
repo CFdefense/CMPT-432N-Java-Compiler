@@ -19,6 +19,10 @@ public class CST {
         myCurrent = null;
     }
 
+    public void clear() {
+        // clear method for resetting tree
+    }
+
     // Method to add node to the correct place
     public void addNode(String treeType, String newType) {
         // Create a new node with the type

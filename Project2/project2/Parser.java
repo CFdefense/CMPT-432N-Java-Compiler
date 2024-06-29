@@ -261,6 +261,7 @@ public class Parser {
 
     public void parseExpr() {
         System.out.println("->Parsing Expr<-");
+
     }
 
     public void parseIntExpr() {
@@ -293,6 +294,14 @@ public class Parser {
 
     public void parseSpace() {
         System.out.println("->Parsing Space<-");
+
+        // Create the node
+        this.myTree.addNode("leaf", "space");
+
+        // match and consume expected space
+        match(" ");
+
+        this.myTree.goUp();
     }
 
     public void parseDigit() {

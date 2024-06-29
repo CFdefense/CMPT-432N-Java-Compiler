@@ -272,7 +272,7 @@ public class Lexer {
                 // The Match is a WHITESPACE
                 else if(match.group().matches(whiteSpace) && inQuotes && !inComment) {
                     // only create a token for a whitespace that exists in quotes
-                    tokenID = "T_CHAR";
+                    tokenID = "T_SPACE";
                     Token newCharToken = new Token(tokenID, myMatch, lineNumber);
                     myTokens.add(newCharToken);
                     System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber + 1) + "...");

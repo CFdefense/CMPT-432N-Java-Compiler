@@ -13,7 +13,7 @@ public class Parser {
     private ArrayList<Token> myTokens; // to store token stream
     private String[] gramType; // to store acceptable types
     private char[] gramChar; // to store acceptable chars
-    private char gramSpace; // to store acceptable space char
+    private String gramSpace; // to store acceptable space char
     private int[] gramDigit; // to store acceptable digits
     private String[] gramBoolOp; // to store acceptable bool op
     private String[] gramBoolVal; // to store acceptable bool val
@@ -32,7 +32,7 @@ public class Parser {
         for (char c = 'a'; c <= 'z'; c++) {
             gramChar[c - 'a'] = c; // using ASCII
         }
-        gramSpace = ' ';
+        gramSpace = " ";
         gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         gramBoolOp = new String[]{"==", "!="};
         gramBoolVal = new String[]{"false", "true"};
@@ -96,6 +96,67 @@ public class Parser {
             System.out.println("ERROR DETECTED -> Token Lexeme [ " + this.currentToken.getLexeme() + " ] DOES NOT MATCH EXPECTED VALUE [ " + expectedValue + " ]");
             this.errorCount++;
         }
+    }
+    // method to determine if the token matches our final grammer
+    public void matchFinal(String expectedType) {
+        // determine which to match
+        boolean switchResult = false;
+        String expected = "";
+        switch(expectedType) {
+            case "ID":
+                for(int i = 0; i < gramDigit.length; i++) {
+                    if(Integer.toString(gramDigit[i]).equalsIgnoreCase(this.currentToken.getLexeme())) {
+                        switchResult = true;
+                        
+                    }
+                    expected = expected + gramDigit[i] + " ";
+                }
+                break;
+            case "TYPE":
+                for(int i = 0; i < gramType.length; i++) {
+                    if(gramType[i].equalsIgnoreCase(this.currentToken.getLexeme())) {
+                        switchResult = true;
+                    }
+                    expected = expected + gramType[i] + " ";
+                }
+                break;
+            case "DIGIT":
+                for(int i = 0; i < gramDigit.length; i++) {
+                    if(Integer.toString(gramDigit[i]).equalsIgnoreCase(this.currentToken.getLexeme())) {
+                        switchResult = true;
+                    }
+                    expected = expected + gramDigit[i] + " ";
+                }
+                break;
+            case "BOOLVAL":
+                for(int i = 0; i < gramBoolVal.length; i++) {
+                    if(gramBoolVal[i].equalsIgnoreCase(this.currentToken.getLexeme())) {
+                        switchResult = true;
+                    }
+                    expected = expected + gramBoolVal[i] + " ";
+                }
+                break;
+            case "BOOLOP":
+                for(int i = 0; i < gramBoolOp.length; i++) {
+                    if(gramBoolOp[i].equalsIgnoreCase(this.currentToken.getLexeme())) {
+                        switchResult = true;
+                    }
+                    expected = expected + gramBoolOp[i] + " ";
+                }
+            break;
+        }
+        // if we successfully match we will create the leaf
+        if(switchResult) {
+            this.myTree.addNode("leaf", this.currentToken.getLexeme());
+        } else {
+            // throw the error
+            System.out.println("ERROR NO MATCH FOUND!!! Input -> " + this.currentToken.getLexeme() + " Does not match any expected: " + expected);
+            this.errorCount++;
+        }
+
+        // get next token
+        this.nextToken();
+
     }
     // Program ::== Block $ -> 
     public void parseProgram() {
@@ -259,39 +320,148 @@ public class Parser {
 
     }
 
+    // Expr ::== IntExpr String Expr BooleanExpr Id 
     public void parseExpr() {
         System.out.println("->Parsing Expr<-");
 
+        // Create the node
+        this.myTree.addNode("branch", "expression");
+
+        // determine expression type and parse accordingly
+        switch(this.currentToken.getType()) {
+            case "T_DIGIT":
+                parseIntExpr();
+                break;
+            case "T_QUOTE":
+                parseStringExpr();
+                break;
+            case "T_TRUE":
+            case "T_FALSE":
+                parseBooleanExpr();
+                break;
+            case "T_ID":
+                parseId();
+                break;
+        }
+        this.myTree.goUp();
     }
 
+    // IntExpr ::== digit intop Expr || digit 
     public void parseIntExpr() {
         System.out.println("->Parsing IntExpr<-");
+        
+        // Create the node
+        this.myTree.addNode("branch", "int expression");
+
+        // parse digit cause always first digit
+        parseDigit();
+
+        // check if now were adding then proceed else nothing
+        if(this.currentToken.getType().equalsIgnoreCase("T_ADD")) {
+            parseIntOp();
+            parseExpr();
+        }
+
+        this.myTree.goUp();
     }
 
+    // StringExpr ::== " CharList " 
     public void parseStringExpr() {
         System.out.println("->Parsing StringExpr<-");
+
+        // Create the node
+        this.myTree.addNode("branch", "string expression");
+
+        // match to the expected format
+        match("\"");
+        parseCharList();
+        match("\"");
+
+        this.myTree.goUp();
     }
 
+    // BooleanExpr ::== ( Expr boolop Expr ) || boolval || char
     public void parseBooleanExpr() {
         System.out.println("->Parsing BooleanExpr<-");
+
+        // Create the node
+        this.myTree.addNode("branch", "boolean expression");
+
+        // if next token is opening parenthesis we know its first format
+        if(this.currentToken.getType().equalsIgnoreCase("T_OPENING_PARENTHESIS")) {
+            match("(");
+            parseExpr();
+            parseBoolOp();
+            parseExpr();
+            match(")");
+        } else if(this.currentToken.getType().equalsIgnoreCase("T_CHAR")) {
+            // char format
+            parseChar();
+        } else {
+            // bool val format
+            parseBoolVal();
+        }
+        this.myTree.goUp();
     }
 
+    //CharList ::== char CharList || space CharList || ε
     public void parseCharList() {
         System.out.println("->Parsing CharList<-");
-    }
 
+        // Create the node
+        this.myTree.addNode("branch", "char list");
+
+        // if next is char then first format
+        if(this.currentToken.getType().equalsIgnoreCase("T_CHAR")) {
+            parseChar();
+            parseCharList();
+        } else if(this.currentToken.getType().equalsIgnoreCase("T_SPACE")) {
+            // if next is space then second format
+            parseSpace();
+            parseCharList();
+        }
+        // else empty do nothing
+
+        this.myTree.goUp();
+    }
+    // Id ::== char 
     public void parseId() {
         System.out.println("->Parsing Id<-");
+
+        // Create the node
+        this.myTree.addNode("branch", "id");
+
+        matchFinal("ID"); // match with grammer
+
+        this.myTree.goUp();
     }
 
+    // type ::== int | string | boolean 
     public void parseType() {
         System.out.println("->Parsing Type<-");
+
+        // Create the node
+        this.myTree.addNode("branch", "type");
+
+        matchFinal("TYPE"); // match with grammer
+
+        this.myTree.goUp();
     }
 
+    // char ::== a | b | c ... z 
     public void parseChar() {
         System.out.println("->Parsing Char<-");
+        
+        // Create the node
+        this.myTree.addNode("branch", "char");
+
+        matchFinal("CHAR"); // match with grammer
+
+        this.myTree.goUp();
+        
     }
 
+    // space ::== the space character 
     public void parseSpace() {
         System.out.println("->Parsing Space<-");
 
@@ -304,19 +474,51 @@ public class Parser {
         this.myTree.goUp();
     }
 
+    // digit ::== 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 
     public void parseDigit() {
         System.out.println("->Parsing Digit<-");
+
+        // Create the node
+        this.myTree.addNode("branch", "digit");
+
+        matchFinal("DIGIT"); // match with grammer
+
+        this.myTree.goUp();
     }
 
+    // boolop ::== == | !=
     public void parseBoolOp() {
         System.out.println("->Parsing BoolOp<-");
+
+        // Create the node
+        this.myTree.addNode("branch", "bool operator");
+
+        matchFinal("BOOLOP"); // match with grammer
+
+        this.myTree.goUp();
     }
 
+    // boolval ::== false | true 
     public void parseBoolVal() {
         System.out.println("->Parsing BoolVal<-");
+
+        // Create the node
+        this.myTree.addNode("branch", "boolean value");
+
+        matchFinal("BOOLVAL"); // match with grammer
+
+        this.myTree.goUp();
     }
 
+    // intop ::== + 
     public void parseIntOp() {
         System.out.println("->Parsing IntOp<-");
+
+        //Create the node
+        this.myTree.addNode("branch", "int operator");
+
+        match("+"); // match for +
+
+        this.myTree.goUp();
     }
 }

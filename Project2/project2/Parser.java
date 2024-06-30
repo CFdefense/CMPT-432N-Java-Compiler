@@ -56,7 +56,7 @@ public class Parser {
         this.myTree.clear();
         this.instructionCount = 0;
         this.errorCount = 0;
-        System.out.println("PARSER CLEARED...");
+        System.out.println("PARSER CLEARED... \n");
         this.foundEnd = false;
         
     }

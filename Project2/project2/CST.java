@@ -47,6 +47,11 @@ public class CST {
 
     }
 
+    // Getter methods
+    public Node getRoot() {
+        return myRoot;
+    }
+
     // Mystery Function to go back up the tree
     public void goUp() {
         if(this.myCurrent.getParent() != null) {
@@ -56,5 +61,24 @@ public class CST {
         }
     }
 
+    // Recursive method to print the CST to the console
+    public void displayCST(Node currNode, int currDepth) {
+        // Print a - for each depth
+        for(int i = 0; i < currDepth; i++) {
+            System.out.print("-");
+        }
 
+        // if leaf node print accordingly
+        if(currNode.getChildren().size() == 0) {
+            System.out.println("[" + currNode.getType() + "]");
+        } else {
+            // print type
+            System.out.println("<" + currNode.getType() + ">");
+            
+            // Recursively call the method on the children of the curr node
+            for(Node child : currNode.getChildren()) {
+            displayCST(child, currDepth + 1);
+        }
+        }
+    }
 }

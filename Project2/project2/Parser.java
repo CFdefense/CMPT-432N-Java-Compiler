@@ -75,12 +75,15 @@ public class Parser {
         // errorcount 
         if(this.foundEnd == true && this.errorCount == 0) {
             System.out.println("PARSE SUCCESSFULLY COMPLETED WITH " + errorCount + " Error(s)");
+            myTree.displayCST(myTree.getRoot(), 0);
             // INSERT NEXT COMPILER PART START
         } else if(this.foundEnd != true) {
             System.out.println("PARSE FAILED FAILED WITH " + errorCount + " Error(s) EOP NOT FOUND");
+            System.out.println("CST WILL NOT BE PRINTED");
             // Say how next part will not start
         } else if(this.errorCount > 0) {
             System.out.println("PARSE FAILED WITH " + this.errorCount + " Error(s)");
+            System.out.println("CST WILL NOT BE PRINTED");
             // Say how next part will not start
         }
     }
@@ -174,7 +177,7 @@ public class Parser {
         this.nextToken();
         
         // create the root node and its type is program
-        myTree.addNode("root", "program");
+        myTree.addNode("root", "Program");
         parseBlock(); 
         // After Recursion we will match this final Token
         match("$");
@@ -186,7 +189,7 @@ public class Parser {
     public void parseBlock() {
         System.out.println("->Parsing Block<-");
         // Create branch node
-        this.myTree.addNode("branch", "block");
+        this.myTree.addNode("branch", "Block");
         match("{");
         parseStatementList();
         match("}");
@@ -195,9 +198,6 @@ public class Parser {
     // StatementList ::== Statement StatementList ε
     public void parseStatementList() {
         System.out.println("->Parsing Statement List<-");
-
-        // Create the node
-        myTree.addNode("branch", "statement list");
 
         // Identify which case of statementlist we have
         switch(this.currentToken.getType()) {
@@ -209,6 +209,8 @@ public class Parser {
             case "T_WHILE":
             case "T_IF":
             case "T_OPENING_BRACE":
+                // Create the node
+                myTree.addNode("branch", "Statement List");
                 parseStatement(); // parse the statement
                 parseStatementList(); // continue to parse the statement list
                 break;
@@ -223,7 +225,7 @@ public class Parser {
         System.out.println("->Parsing Statement<-");
 
         // Create the node
-        myTree.addNode("branch", "statement");
+        myTree.addNode("branch", "Statement");
 
         // Determine and execute the correct operation
         switch(this.currentToken.getType()) {
@@ -259,7 +261,7 @@ public class Parser {
         System.out.println("->Parsing Print<-");
 
         //Create the node
-        this.myTree.addNode("branch", "print");
+        this.myTree.addNode("branch", "Print");
 
         // match and consume the ( expected token
         match("print");
@@ -278,7 +280,7 @@ public class Parser {
         System.out.println("->Parsing Assignment<-");
 
         //create the node
-        this.myTree.addNode("branch", "assignment");
+        this.myTree.addNode("branch", "Assignment");
 
         // Parse expected 'ID'
         parseId();
@@ -308,7 +310,7 @@ public class Parser {
         System.out.println("->Parsing While<-");
 
         // Create the node
-        this.myTree.addNode("branch", "while");
+        this.myTree.addNode("branch", "While");
 
         // match and use the expected while
         match("while");
@@ -323,7 +325,7 @@ public class Parser {
         System.out.println("->Parsing If<-");
         
         // Create the node
-        this.myTree.addNode("branch", "if");
+        this.myTree.addNode("branch", "IF");
 
         // match expected if
         match("if");
@@ -341,7 +343,7 @@ public class Parser {
         System.out.println("->Parsing Expr<-");
 
         // Create the node
-        this.myTree.addNode("branch", "expression");
+        this.myTree.addNode("branch", "Expression");
 
         // determine expression type and parse accordingly
         switch(this.currentToken.getType()) {
@@ -367,7 +369,7 @@ public class Parser {
         System.out.println("->Parsing IntExpr<-");
         
         // Create the node
-        this.myTree.addNode("branch", "int expression");
+        this.myTree.addNode("branch", "Int Expression");
 
         // Parse digit cause we always parse first
         parseDigit();
@@ -386,7 +388,7 @@ public class Parser {
         System.out.println("->Parsing StringExpr<-");
 
         // Create the node
-        this.myTree.addNode("branch", "string expression");
+        this.myTree.addNode("branch", "String Expression");
 
         // match to the expected format
         match("\"");
@@ -401,7 +403,7 @@ public class Parser {
         System.out.println("->Parsing BooleanExpr<-");
 
         // Create the node
-        this.myTree.addNode("branch", "boolean expression");
+        this.myTree.addNode("branch", "Boolean Expression");
 
         // if next token is opening parenthesis we know its first format
         if(this.currentToken.getType().equalsIgnoreCase("T_OPENING_PARENTHESIS")) {
@@ -425,7 +427,7 @@ public class Parser {
         System.out.println("->Parsing CharList<-");
 
         // Create the node
-        this.myTree.addNode("branch", "char list");
+        this.myTree.addNode("branch", "Char List");
 
         // if next is char then first format
         if(this.currentToken.getType().equalsIgnoreCase("T_CHAR")) {
@@ -445,7 +447,7 @@ public class Parser {
         System.out.println("->Parsing Id<-");
 
         // Create the node
-        this.myTree.addNode("branch", "id");
+        this.myTree.addNode("branch", "ID");
 
         matchFinal("ID"); // match with grammer
 
@@ -457,7 +459,7 @@ public class Parser {
         System.out.println("->Parsing Type<-");
 
         // Create the node
-        this.myTree.addNode("branch", "type");
+        this.myTree.addNode("branch", "Type");
 
         matchFinal("TYPE"); // match with grammer
 
@@ -469,7 +471,7 @@ public class Parser {
         System.out.println("->Parsing Char<-");
         
         // Create the node
-        this.myTree.addNode("branch", "char");
+        this.myTree.addNode("branch", "Char");
 
         matchFinal("CHAR"); // match with grammer
 
@@ -482,7 +484,7 @@ public class Parser {
         System.out.println("->Parsing Space<-");
 
         // Create the node
-        this.myTree.addNode("leaf", "space");
+        this.myTree.addNode("leaf", "Space");
 
         // match and consume expected space
         match(" ");
@@ -495,7 +497,7 @@ public class Parser {
         System.out.println("->Parsing Digit<-");
 
         // Create the node
-        this.myTree.addNode("branch", "digit");
+        this.myTree.addNode("branch", "Digit");
 
         matchFinal("DIGIT"); // match with grammer
 
@@ -507,7 +509,7 @@ public class Parser {
         System.out.println("->Parsing BoolOp<-");
 
         // Create the node
-        this.myTree.addNode("branch", "bool operator");
+        this.myTree.addNode("branch", "Boolean Operator");
 
         matchFinal("BOOLOP"); // match with grammer
 
@@ -519,7 +521,7 @@ public class Parser {
         System.out.println("->Parsing BoolVal<-");
 
         // Create the node
-        this.myTree.addNode("branch", "boolean value");
+        this.myTree.addNode("branch", "Boolean Value");
 
         matchFinal("BOOLVAL"); // match with grammer
 
@@ -531,7 +533,7 @@ public class Parser {
         System.out.println("->Parsing IntOp<-");
 
         //Create the node
-        this.myTree.addNode("branch", "int operator");
+        this.myTree.addNode("branch", "Int Operator");
 
         match("+"); // match for +
 

@@ -45,6 +45,14 @@ public class Node {
         return myParent;
     }
 
+    public String getType() {
+        return myType;
+    }
+
+    public ArrayList<Node> getChildren() {
+        return myChildren;
+    }
+
     // Method for adding children
     public void addChild(Node newChild) {
         myChildren.add(newChild);

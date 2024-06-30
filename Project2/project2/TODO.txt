@@ -16,6 +16,4 @@ if errors in lex do not parse DONE
 LOOK AT slide 137-198
 
 -- TODO --
-
-test Parser
-test CST
+test CST and print

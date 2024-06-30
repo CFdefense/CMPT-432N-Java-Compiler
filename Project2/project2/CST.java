@@ -19,14 +19,16 @@ public class CST {
         myCurrent = null;
     }
 
+    // clear method for resetting tree
     public void clear() {
-        // clear method for resetting tree
+        myRoot = null;
+        myCurrent = null;
     }
 
     // Method to add node to the correct place
     public void addNode(String treeType, String newType) {
         // Create a new node with the type
-        Node newNode = new Node(newType);
+        Node newNode = new Node(newType, treeType);
 
         // Check if the tree is empty
         if(this.myRoot == null) {
@@ -47,7 +49,11 @@ public class CST {
 
     // Mystery Function to go back up the tree
     public void goUp() {
-        this.myCurrent = this.myCurrent.getParent();
+        if(this.myCurrent.getParent() != null) {
+            this.myCurrent = this.myCurrent.getParent();
+        } else {
+            System.out.println("ERROR - COULD NOT MOVE UP TREE");
+        }
     }
 
 

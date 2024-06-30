@@ -1,9 +1,4 @@
 {}$
-{{{{{}}}}}$
-{{{{{{}}}}/* Ignored */}}$
-{/* comments ignored */} int @ }$
-{int a
-a = a
-string b
-a = b
-}$
+{{{{{{}}}}}}$
+{{{{{{}}} /* comments are ignored */ }}}}$
+{ /* comments are still ignored */ int @}$

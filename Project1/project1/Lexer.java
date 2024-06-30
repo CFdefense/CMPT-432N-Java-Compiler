@@ -244,7 +244,7 @@ public class Lexer {
                     
                     // if the digit exists in quote throw an error to prevent parsing errors later
                     if(inQuotes) {
-                        System.out.println("ERROR - UNAUTHORIZED DIGIT IN QUOTES [ " + myMatch + " ] at line " + (lineNumber +1) + "..." );
+                        System.out.println("ERROR - UNAUTHORIZED DIGIT(S) IN QUOTES [ " + myMatch + " ] at line " + (lineNumber +1) + "..." );
                         this.errorCount++;
                     // if the digit is not in quotes add normally
                     } else {

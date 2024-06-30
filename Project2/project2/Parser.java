@@ -12,59 +12,77 @@ public class Parser {
     // Private Instance Variables
     private ArrayList<Token> myTokens; // to store token stream
     private String[] gramType; // to store acceptable types
-    private char[] gramChar; // to store acceptable chars
-    private String gramSpace; // to store acceptable space char
+    private String[] gramChar; // to store acceptable chars
     private int[] gramDigit; // to store acceptable digits
     private String[] gramBoolOp; // to store acceptable bool op
     private String[] gramBoolVal; // to store acceptable bool val
-    private char intOp; // to store acceptable int op
     private CST myTree; // instance of Concrete Syntax Tree
     private int instructionCount; // count what instruction we are on
     private Token currentToken; // the current token we are on
     private int errorCount; // the number of errors found
+    private boolean foundEnd;
 
     // Null Constructor
     public Parser() {
         // Initialize Private Variables
         myTokens = new ArrayList<Token>();
         gramType = new String[]{"int", "string", "boolean"};
-        gramChar = new char[26];
+        gramChar = new String[26];
         for (char c = 'a'; c <= 'z'; c++) {
-            gramChar[c - 'a'] = c; // using ASCII
+            gramChar[c - 'a'] = String.valueOf(c); // using ASCII
         }
-        gramSpace = " ";
         gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         gramBoolOp = new String[]{"==", "!="};
         gramBoolVal = new String[]{"false", "true"};
-        intOp = '+';
 
         myTree = new CST();
         instructionCount = 0;
         currentToken = null;
+        foundEnd = false;
     }
 
-    //! Method to read in tokens to parser
+    // Method to read in tokens to parser
     public void tokenStream(ArrayList<Token> lexerTokens) {
         // add each token from method call to parser tokens
         for(Token currToken : lexerTokens) {
-            myTokens.add(currToken);
+            this.myTokens.add(currToken);
         }
         System.out.println("LEXER TOKENS CACHED IN PARSER...");
     }
 
-    //! Method to reset parser in between program uses
+    // Method to reset parser in between program uses
     public void reset() {
         this.myTokens.clear(); // reset token arrayList
         this.myTree.clear();
         this.instructionCount = 0;
         this.errorCount = 0;
         System.out.println("PARSER CLEARED...");
+        this.foundEnd = false;
         
     }
 
-    //! Method to get next token from stream -> increment instructionCount
+    // Method to get next token from stream -> increment instructionCount
     public void nextToken() {
-        this.currentToken = this.myTokens.get(this.instructionCount++);
+        // Check if there are more tokens to get
+        if(this.instructionCount < myTokens.size()) {
+            this.currentToken = this.myTokens.get(this.instructionCount++);
+        }
+    }
+
+    // Method to determine the results of the parse
+    public void parseResults() {
+        // foundEnd -> if EOP is found
+        // errorcount 
+        if(this.foundEnd == true && this.errorCount == 0) {
+            System.out.println("PARSE SUCCESSFULLY COMPLETED WITH " + errorCount + " Error(s)");
+            // INSERT NEXT COMPILER PART START
+        } else if(this.foundEnd != true) {
+            System.out.println("PARSE FAILED FAILED WITH " + errorCount + " Error(s) EOP NOT FOUND");
+            // Say how next part will not start
+        } else if(this.errorCount > 0) {
+            System.out.println("PARSE FAILED WITH " + this.errorCount + " Error(s)");
+            // Say how next part will not start
+        }
     }
 
     // Method to match and add our tokens
@@ -73,24 +91,13 @@ public class Parser {
         // Check if EOP -> check for errors and begin semantic anaylsis
         if(this.currentToken.getLexeme().equals("$")) {
             // Create Node and update next
+            this.foundEnd = true; // indicate we found the end
             this.myTree.addNode("leaf", currentToken.getLexeme());
-            if(this.instructionCount < myTokens.size()) {
-                this.nextToken();
-            }
-            // If there are no errors weve reached the end of the parse
-            if(this.errorCount == 0) {
-                System.out.println("PARSE SUCCESSFULLY COMPLETED WITH " + this.errorCount + " ERROR(S)...");
-                // output cst and begin semantic analysis
-            } else {
-                System.out.println("PARSE FAILED! DUE TO " + this.errorCount + " ERROR(S)...");
-                System.out.println("CST Will Not be Displayed...")
-            }
+            nextToken();
         } else if(this.currentToken.getLexeme().equalsIgnoreCase(expectedValue)) {
             // If Current Lexeme matches we make Node and update next
             this.myTree.addNode("leaf", this.currentToken.getLexeme());
-            if(this.instructionCount < myTokens.size()) {
-                this.nextToken();
-            }
+            nextToken();
         } else {
             // if the current token does not match expected throw an error
             System.out.println("ERROR DETECTED -> Token Lexeme [ " + this.currentToken.getLexeme() + " ] DOES NOT MATCH EXPECTED VALUE [ " + expectedValue + " ]");
@@ -103,13 +110,14 @@ public class Parser {
         boolean switchResult = false;
         String expected = "";
         switch(expectedType) {
+            case "CHAR":
             case "ID":
-                for(int i = 0; i < gramDigit.length; i++) {
-                    if(Integer.toString(gramDigit[i]).equalsIgnoreCase(this.currentToken.getLexeme())) {
+                for(int i = 0; i < gramChar.length; i++) {
+                    if(gramChar[i].equalsIgnoreCase(this.currentToken.getLexeme())) {
                         switchResult = true;
                         
                     }
-                    expected = expected + gramDigit[i] + " ";
+                    expected = expected + gramChar[i] + " ";
                 }
                 break;
             case "TYPE":
@@ -161,11 +169,17 @@ public class Parser {
     // Program ::== Block $ -> 
     public void parseProgram() {
         System.out.println("->Parsing Program<-");
+        
+        // get first token
+        this.nextToken();
+        
         // create the root node and its type is program
         myTree.addNode("root", "program");
         parseBlock(); 
         // After Recursion we will match this final Token
         match("$");
+
+        parseResults();
     }
 
     // Block ::== { StatementList } 
@@ -202,7 +216,6 @@ public class Parser {
                 // empty statement list
                 break;
         }
-        this.myTree.goUp();
     }
 
     // Statement ::== PrintStatement AssignmentStatement VarDecl WhileStatement IfStatement Block 
@@ -235,6 +248,8 @@ public class Parser {
             case "T_OPENING_BRACE":
                 parseBlock();
                 break;
+            default:
+                break;
         }
         this.myTree.goUp();
     }
@@ -247,6 +262,7 @@ public class Parser {
         this.myTree.addNode("branch", "print");
 
         // match and consume the ( expected token
+        match("print");
         match("(");
 
         parseExpr(); // parse next token which should be the expr
@@ -269,7 +285,7 @@ public class Parser {
         
         match("="); // match expected =
 
-        // parse expected 'Expr'
+        // parse expected future 'Expr'
         parseExpr();
 
         this.myTree.goUp();
@@ -332,7 +348,7 @@ public class Parser {
             case "T_DIGIT":
                 parseIntExpr();
                 break;
-            case "T_QUOTE":
+            case "T_QUOTES":
                 parseStringExpr();
                 break;
             case "T_TRUE":
@@ -353,11 +369,11 @@ public class Parser {
         // Create the node
         this.myTree.addNode("branch", "int expression");
 
-        // parse digit cause always first digit
+        // Parse digit cause we always parse first
         parseDigit();
 
-        // check if now were adding then proceed else nothing
-        if(this.currentToken.getType().equalsIgnoreCase("T_ADD")) {
+        // if next is intop we continue
+        if(this.currentToken.getType().equalsIgnoreCase("T_ADDITION_OP")) {
             parseIntOp();
             parseExpr();
         }

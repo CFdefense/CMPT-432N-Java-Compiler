@@ -247,7 +247,7 @@ public class Lexer {
                     
                     // if the digit exists in quote throw an error to prevent parsing errors later
                     if(inQuotes) {
-                        System.out.println("ERROR - UNAUTHORIZED DIGIT IN QUOTES [ " + myMatch + " ] at line " + (lineNumber +1) + "..." );
+                        System.out.println("ERROR - UNAUTHORIZED DIGIT(S) IN QUOTES [ " + myMatch + " ] at line " + (lineNumber +1) + "..." );
                         this.errorCount++;
                     // if the digit is not in quotes add normally
                     } else {
@@ -334,7 +334,7 @@ public class Lexer {
             // output final conclusion
             if(this.errorCount > 0) {
                 System.out.println("Lexical Analysis Failed - Reached End of Program with "+ this.warningCount + " Warning(s) and " + this.errorCount + " Error(s) \n");
-                System.out.println("PARSER WILL NOT START DUE TO ERRORS \n");
+                System.out.println("PARSER WILL NOT START DUE TO LEX ERRORS \n");
             } else {
                 System.out.println("Lexical Anaylsis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
                 System.out.println("PARSER STARTING... \n");
@@ -342,6 +342,8 @@ public class Lexer {
                 // Send tokens to PARSER
                 myParser.tokenStream(myTokens);
                 
+                // Start Parsing
+                myParser.parseProgram();
             }
 
             // save to total tokens before reset
@@ -379,6 +381,9 @@ public class Lexer {
 
             // Send Tokens to PARSER
             myParser.tokenStream(myTokens);
+
+            // Start parsing
+            myParser.parseProgram();
         }
 
         // Save Tokens

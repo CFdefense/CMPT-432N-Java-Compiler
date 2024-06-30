@@ -10,20 +10,23 @@ import java.util.ArrayList;
 public class Node {
 
     // Private Instance Variables
-    private String myType;
-    private Node myParent;
-    private ArrayList<Node> myChildren;
+    private String myType; // to indicate token type
+    private String myTreeType; // to indicate type of tree structure
+    private Node myParent; // parent node
+    private ArrayList<Node> myChildren; // list of child nodes
     
     // Null Constructor
     public Node() {
         myType = "";
+        myTreeType = "";
         myParent = null;
         myChildren = new ArrayList<Node>();
     }
 
     // Semi Constructor
-    public Node(String newType) {
+    public Node(String newType, String newTreeType) {
         myType = newType;
+        myTreeType = newTreeType;
         myParent = null;
         myChildren = new ArrayList<Node>();
     }

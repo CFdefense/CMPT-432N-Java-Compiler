@@ -21,6 +21,4 @@ Warnings -> declared but unused identifiers, use of unitialized variables, initi
 
 --TODO--
 
-1. Read slides and understand
-
-2. begin
+Debug and complete AST creation

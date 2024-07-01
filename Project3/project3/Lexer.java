@@ -25,7 +25,7 @@ public class Lexer {
     private int warningCount; // running total of warnings for a program
     private boolean foundEnd; // boolean to determine if weve hit an EOP
     private boolean foundNew; // boolean to determine if were starting a new program
-    private Parser myParser;
+    private Parser myParser; // Parser instance to begin next step of compiling
     
     //! Begin Lexer Construction and Manipulation
 

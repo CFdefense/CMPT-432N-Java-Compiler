@@ -10,8 +10,8 @@ package project3;
 public class CST {
 
     // Private Instance Variables
-    private Node myRoot;
-    private Node myCurrent;
+    private Node myRoot; // the root node of the tree
+    private Node myCurrent; // the current node we are on
 
     //! Begin CST Construction and Manipulation
 

@@ -8,15 +8,15 @@ package project2;
 public class Token {
     
     // Private Instance Variables
-    private String myType;
-    private String myLexeme;
-    private int myLine;
+    private String myType; // type of token
+    private String myLexeme; // lexeme of token
+    private int myLine; // line token is on
 
     //! Begin Token Construction and Manipulation
 
     // Full Constructor
     public Token(String newType, String newLexeme, int newLine) {
-        this.myType = newType;
+        this.myType = newType; 
         this.myLexeme =newLexeme;
         this.myLine = newLine;
     }

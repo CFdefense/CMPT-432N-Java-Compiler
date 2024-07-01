@@ -8,9 +8,9 @@ package project3;
 public class Token {
     
     // Private Instance Variables
-    private String myType;
-    private String myLexeme;
-    private int myLine;
+    private String myType; // type of token
+    private String myLexeme; // lexeme of token
+    private int myLine; // the line the token is on
 
     //! Begin Token Construction and Manipulation
 

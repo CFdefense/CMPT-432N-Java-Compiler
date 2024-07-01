@@ -12,12 +12,18 @@ public class Token {
     private String myLexeme;
     private int myLine;
 
+    //! Begin Token Construction and Manipulation
+
     // Full Constructor
     public Token(String newType, String newLexeme, int newLine) {
         this.myType = newType;
         this.myLexeme =newLexeme;
         this.myLine = newLine;
     }
+
+    //! End Token Construction and Manipulation
+
+    //! Begin Token Methods
 
     // Getter Methods
     public String getType() {
@@ -31,5 +37,7 @@ public class Token {
     public int getLine() {
         return this.myLine;
     }
+
+    //! End Token Methods
 
 }

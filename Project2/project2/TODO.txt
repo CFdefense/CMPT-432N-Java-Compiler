@@ -15,5 +15,5 @@ if errors in lex do not parse DONE
 
 LOOK AT slide 137-198
 
--- TODO --
-test CST and print
+--TODO--
+DONE 

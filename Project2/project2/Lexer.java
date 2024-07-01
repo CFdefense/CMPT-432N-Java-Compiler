@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lexer {
+
     // Private Object Instance Variables
     private ArrayList<String> fileLines; // array to store each file line
     private ArrayList<Token> myTokens;  // array to store a single program tokens
@@ -26,7 +27,8 @@ public class Lexer {
     private boolean foundNew; // boolean to determine if were starting a new program
     private Parser myParser;
     
-    //! Lexer default constructor
+    //! Begin Lexer Construction and Manipulation
+
     public Lexer() {
         this.fileLines = new ArrayList<String>();
         this.myTokens = new ArrayList<Token>();
@@ -41,7 +43,7 @@ public class Lexer {
 
     }
     
-    //! Method for reading in a file
+    // Method for reading in a file
     public boolean readFile(String fileName) {
         // Instance Variables
         boolean result; 
@@ -73,7 +75,7 @@ public class Lexer {
         return result;
     }
 
-    //! Method to clear our lexer 
+    // Method to clear our lexer 
     public void clearLexer() {
         this.myTokens.clear();
         this.inComment = false;
@@ -85,7 +87,10 @@ public class Lexer {
         this.myParser.reset();
     }
 
-    //! Start of Lexical Analysis (Scanner)
+    //! End of Lexer Construction and Manipulation
+
+    //! Start Lexical Analysis (Scanner)
+
     public void lexicalAnalysis() {
 
         System.out.println("Running Lexical Analysis");
@@ -329,6 +334,7 @@ public class Lexer {
                     this.errorCount++;
                 }
             } 
+            
         // line done parsing - check for warnings and output
         if(this.foundEnd) {
             // output final conclusion

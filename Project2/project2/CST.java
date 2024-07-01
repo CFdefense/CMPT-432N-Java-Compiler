@@ -1,7 +1,7 @@
 /*
     CST - Concrete Syntax Tree
-    Tree representation of the Grammar(Rules of how the program should be written)
-    Will store and manipulate a stream of tokens in conjunction with our established grammer rules
+    Tree representation of the Grammar (Rules of how the program should be written)
+    Will Properly place Nodes created by the Parser in a CST tree format
 
 */
 
@@ -13,16 +13,27 @@ public class CST {
     private Node myRoot;
     private Node myCurrent;
 
+    //! Begin CST Construction and Manipulation
+
     // Null Constructor
     public CST() {
-        myRoot = null;
-        myCurrent = null;
+        this.myRoot = null;
+        this.myCurrent = null;
     }
 
     // clear method for resetting tree
     public void clear() {
-        myRoot = null;
-        myCurrent = null;
+        this.myRoot = null;
+        this.myCurrent = null;
+    }
+
+    //! End CST Construction and Manipulation
+
+    //! Begin CST Methods
+
+    // Getter method
+    public Node getRoot() {
+        return this.myRoot;
     }
 
     // Method to add node to the correct place
@@ -36,7 +47,7 @@ public class CST {
             newNode.setParent(null);
         } else {
             // Else we set the parent to be our current
-            newNode.setParent(myCurrent);
+            newNode.setParent(this.myCurrent);
             newNode.getParent().addChild(newNode);
         }
 
@@ -47,23 +58,19 @@ public class CST {
 
     }
 
-    // Getter methods
-    public Node getRoot() {
-        return myRoot;
-    }
-
     // Mystery Function to go back up the tree
     public void goUp() {
         if(this.myCurrent.getParent() != null) {
             this.myCurrent = this.myCurrent.getParent();
         } else {
+            // Throw error if reached root before we should have
             System.out.println("ERROR - COULD NOT MOVE UP TREE");
         }
     }
 
     // Recursive method to print the CST to the console
     public void displayCST(Node currNode, int currDepth) {
-        // Print a - for each depth
+        // Print a '-' for each depth per example
         for(int i = 0; i < currDepth; i++) {
             System.out.print("-");
         }
@@ -81,4 +88,6 @@ public class CST {
         }
         }
     }
+
+    //! End CST Methods
 }

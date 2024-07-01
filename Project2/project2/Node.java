@@ -14,13 +14,15 @@ public class Node {
     private String myTreeType; // to indicate type of tree structure
     private Node myParent; // parent node
     private ArrayList<Node> myChildren; // list of child nodes
+
+    //! Start Node Construction
     
     // Null Constructor
     public Node() {
-        myType = "";
-        myTreeType = "";
-        myParent = null;
-        myChildren = new ArrayList<Node>();
+        this.myType = "";
+        this.myTreeType = "";
+        this.myParent = null;
+        this.myChildren = new ArrayList<Node>();
     }
 
     // Semi Constructor
@@ -31,30 +33,40 @@ public class Node {
         myChildren = new ArrayList<Node>();
     }
 
+    //! End Node Construction
+
+    //! Begin Node Methods
+
     // Setter Methods
     public void setType(String newType) {
-        myType = newType;
+        this. myType = newType;
     }
 
     public void setParent(Node newParent) {
-        myParent = newParent;
+        this.myParent = newParent;
     }
 
     // Getter Methods
     public Node getParent() {
-        return myParent;
+        return this.myParent;
     }
 
     public String getType() {
-        return myType;
+        return this.myType;
+    }
+
+    public String getTreeType() {
+        return this.myTreeType;
     }
 
     public ArrayList<Node> getChildren() {
-        return myChildren;
+        return this.myChildren;
     }
 
     // Method for adding children
     public void addChild(Node newChild) {
-        myChildren.add(newChild);
+        this.myChildren.add(newChild);
     }
+
+    //! End Node Methods
 }

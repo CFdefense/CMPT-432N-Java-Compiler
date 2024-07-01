@@ -9,6 +9,7 @@ package project2;
 import java.util.ArrayList;
 
 public class Parser {
+    
     // Private Instance Variables
     private ArrayList<Token> myTokens; // to store token stream
     private String[] gramType; // to store acceptable types
@@ -20,7 +21,9 @@ public class Parser {
     private int instructionCount; // count what instruction we are on
     private Token currentToken; // the current token we are on
     private int errorCount; // the number of errors found
-    private boolean foundEnd;
+    private boolean foundEnd; // flag to mark if EOP is found to trigger parseResults()
+
+    //! Begin Parser Construction and Manipulation
 
     // Null Constructor
     public Parser() {
@@ -88,13 +91,17 @@ public class Parser {
         }
     }
 
-    // Method to match and add our tokens
+    //! End Parser Construction and Manipulation
+
+    //! Begin Methods for Matching Lexemes
+
+    // Method to match the current lexeme with its expected value
     public void match(String expectedValue) {
 
         // Check if EOP -> check for errors and begin semantic anaylsis
         if(this.currentToken.getLexeme().equals("$")) {
             // Create Node and update next
-            this.foundEnd = true; // indicate we found the end
+            this.foundEnd = true; // indicate we found the end -> parseResults()
             this.myTree.addNode("leaf", currentToken.getLexeme());
             nextToken();
         } else if(this.currentToken.getLexeme().equalsIgnoreCase(expectedValue)) {
@@ -103,11 +110,12 @@ public class Parser {
             nextToken();
         } else {
             // if the current token does not match expected throw an error
-            System.out.println("ERROR DETECTED -> Token Lexeme [ " + this.currentToken.getLexeme() + " ] DOES NOT MATCH EXPECTED VALUE [ " + expectedValue + " ]");
+            System.out.println("ERROR DETECTED -> Token Lexeme [ " + this.currentToken.getLexeme() + " ] DOES NOT MATCH EXPECTED VALUE [ " + expectedValue + " ] at line " + this.currentToken.getLine());
             this.errorCount++;
         }
     }
-    // method to determine if the token matches our final grammer
+
+    // Method to determine if current lexeme matches any of the expected values of its type in our grammer
     public void matchFinal(String expectedType) {
         // determine which to match
         boolean switchResult = false;
@@ -156,11 +164,12 @@ public class Parser {
                 }
             break;
         }
+
         // if we successfully match we will create the leaf
         if(switchResult) {
             this.myTree.addNode("leaf", this.currentToken.getLexeme());
         } else {
-            // throw the error
+            // throw error for unmatched expected lexeme
             System.out.println("ERROR NO MATCH FOUND!!! Input -> " + this.currentToken.getLexeme() + " Does not match any expected: " + expected);
             this.errorCount++;
         }
@@ -169,7 +178,12 @@ public class Parser {
         this.nextToken();
 
     }
-    // Program ::== Block $ -> 
+
+    //! End Methods for Matching Lexemes
+
+    // ! Begin Methods for Parsing Grammer
+
+    // Program ::== Block $ 
     public void parseProgram() {
         System.out.println("->Parsing Program<-");
         
@@ -199,6 +213,9 @@ public class Parser {
     public void parseStatementList() {
         System.out.println("->Parsing Statement List<-");
 
+        // Create the node
+        myTree.addNode("branch", "Statement List");
+
         // Identify which case of statementlist we have
         switch(this.currentToken.getType()) {
             case "T_PRINT":
@@ -209,8 +226,6 @@ public class Parser {
             case "T_WHILE":
             case "T_IF":
             case "T_OPENING_BRACE":
-                // Create the node
-                myTree.addNode("branch", "Statement List");
                 parseStatement(); // parse the statement
                 parseStatementList(); // continue to parse the statement list
                 break;
@@ -218,6 +233,7 @@ public class Parser {
                 // empty statement list
                 break;
         }
+        this.myTree.goUp();
     }
 
     // Statement ::== PrintStatement AssignmentStatement VarDecl WhileStatement IfStatement Block 
@@ -310,7 +326,7 @@ public class Parser {
         System.out.println("->Parsing While<-");
 
         // Create the node
-        this.myTree.addNode("branch", "While");
+        this.myTree.addNode("branch", "While Statement");
 
         // match and use the expected while
         match("while");
@@ -325,7 +341,7 @@ public class Parser {
         System.out.println("->Parsing If<-");
         
         // Create the node
-        this.myTree.addNode("branch", "IF");
+        this.myTree.addNode("branch", "IF Statement");
 
         // match expected if
         match("if");
@@ -426,22 +442,30 @@ public class Parser {
     public void parseCharList() {
         System.out.println("->Parsing CharList<-");
 
-        // Create the node
-        this.myTree.addNode("branch", "Char List");
-
-        // if next is char then first format
-        if(this.currentToken.getType().equalsIgnoreCase("T_CHAR")) {
-            parseChar();
-            parseCharList();
-        } else if(this.currentToken.getType().equalsIgnoreCase("T_SPACE")) {
-            // if next is space then second format
-            parseSpace();
-            parseCharList();
+        boolean hasChar = false;
+    
+        while (this.currentToken.getType().equalsIgnoreCase("T_CHAR") ||
+               this.currentToken.getType().equalsIgnoreCase("T_SPACE")) {
+            // Create the node only if we find a char or space
+            if (!hasChar) {
+                this.myTree.addNode("branch", "Char List");
+                hasChar = true;
+            }
+    
+            // if next is char then first format
+            if (this.currentToken.getType().equalsIgnoreCase("T_CHAR")) {
+                parseChar();
+            } else if (this.currentToken.getType().equalsIgnoreCase("T_SPACE")) {
+                // if next is space then second format
+                parseSpace();
+            }
         }
-        // else empty do nothing
-
-        this.myTree.goUp();
+    
+        if (hasChar) {
+            this.myTree.goUp();
+        }
     }
+
     // Id ::== char 
     public void parseId() {
         System.out.println("->Parsing Id<-");
@@ -484,7 +508,7 @@ public class Parser {
         System.out.println("->Parsing Space<-");
 
         // Create the node
-        this.myTree.addNode("leaf", "Space");
+        this.myTree.addNode("branch", "Space");
 
         // match and consume expected space
         match(" ");
@@ -539,4 +563,6 @@ public class Parser {
 
         this.myTree.goUp();
     }
+
+    //! End Methods for Parsing Grammer
 }

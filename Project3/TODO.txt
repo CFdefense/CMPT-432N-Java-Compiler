@@ -1,0 +1,26 @@
+Project 3 - AST and Semantic Analysis
+
+--LEX AND PARSE MUST BE SUCCESSFULL--
+
+1. Create and Display AST from CST or tokens
+
+2. Semantic Analysis -> Scope Checks and Type Checks the AST
+
+3. Create and Display Symbol Table with type and Scope Information
+
+Important::
+While Scope-Checking 
+    -> build symbol table of IDS which includes [Name, datatype, scope, position, etc]
+
+Type check source code using AST and symbol table
+
+Errors -> undeclared identifiers, redeclared identifiers in same scope, type mismatch, etc.
+
+Warnings -> declared but unused identifiers, use of unitialized variables, initialized used variables
+
+
+--TODO--
+
+1. Read slides and understand
+
+2. begin

@@ -80,9 +80,12 @@ public class Parser {
         // errorcount 
         if(this.foundEnd == true && this.errorCount == 0) {
             System.out.println("PARSE SUCCESSFULLY COMPLETED WITH " + errorCount + " Error(s)");
+            
+            System.out.println("Displaying Concrete Syntax Tree...");
             myTree.displayCST(myTree.getRoot(), 0);
 
             // load and create AST
+            System.out.println("Creating Abstract Syntax Tree...");
             myAST.loadAST(myTree);
 
             // Maybe Do Semantic Analysis here

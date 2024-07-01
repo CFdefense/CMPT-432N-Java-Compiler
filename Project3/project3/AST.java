@@ -63,6 +63,7 @@ public class AST {
         switch(nodeType) {
             case "Program":
                 // Create new node
+                System.out.println("Creating Program");
                 Node newASTNode = new Node("Program", "root");
 
                 // Set AST root as this new node
@@ -80,6 +81,29 @@ public class AST {
                 }
 
                 break;
+            case "Digit":
+            case "ID":
+            case "Statement List":
+            case "Statement":
+            case "Expression":
+            case "String Expression":
+            case "Char List": // to be fixed?
+                // Dont Create but move deeper
+                System.out.println("Found " + nodeType + " were going deeper");
+
+                // No update for AST nodes because no new ones created
+
+                // update current CST node
+                this.myCurrCST = currCSTNode;
+
+                // Recursively call on chilren of currCST node
+                for(Node child : this.myCurrCST.getChildren()) {
+                    createAST(child);
+                }
+                
+                // Move up?
+
+                break;
             case "Block":
             case "VarDecl":
             case "Assignment":
@@ -90,8 +114,10 @@ public class AST {
             case "IF Statement":
             case "While Statement":
             case "Boolean Expression":
+            case "Int Expression":
                 // create the node to be added
                 Node newNode = new Node(nodeType,"Branch");
+                System.out.println("Created " + nodeType);
                 
                 // add the created node to the AST
                 this.myCurrAST.addChild(newNode);
@@ -110,6 +136,7 @@ public class AST {
                 // Move up?
 
             default:
+
                 // Check for matching char
                 for(int i = 0; i < this.gramChar.length; i++) {
                     if(nodeType.equalsIgnoreCase(gramChar[i])) {
@@ -128,7 +155,7 @@ public class AST {
                 if(foundDigChar) {
                     // create new leaf node
                     Node newFound = new Node(nodeType, "leaf");
-
+                    System.out.println("Created " + nodeType);
                     // add leaf node to AST
                     this.myCurrAST.addChild(newFound);
 

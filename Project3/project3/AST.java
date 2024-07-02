@@ -47,18 +47,19 @@ public class AST {
 
         // Call creation of AST
         createAST(myCST.getRoot());
+        System.out.println("AST Created...");
+
+        // Display the AST
+        System.out.println("DISPLAYING AST...");
+        displayAST(myASTRoot, 0);
     }
 
-    // Method for converting the CST into the AST 'Just the good stuff'
-    // AST WILL CONTAIN -> Block(no brace), VarDecl, Type/Id(Specific ie 'int' or 'a' etc)
-    // -> Assignment, Print Statement
-    // Traverse the CST looking for the above statements
+    // Method for converting the CST into the AST 'Just the good stuff' 
     public void createAST(Node currCSTNode) {
 
         // Instance Variable for Type of CST Node
         String nodeType = currCSTNode.getType();
         boolean foundDigChar = false;
-        boolean digit = false;
 
         // check for types -> these will create a node and continue down
         switch(nodeType) {
@@ -92,8 +93,6 @@ public class AST {
                 // Dont Create but move deeper
                 System.out.println("Found " + nodeType + " were going deeper");
 
-                // No update for AST nodes because no new ones created
-
                 // update current CST node
                 this.myCurrCST = currCSTNode;
 
@@ -102,8 +101,9 @@ public class AST {
                     createAST(child);
                 }
                 
-                // Move up?
+                // Move up CST
                 goUpCST();
+
                 break;
             case "Block":
             case "VarDecl":
@@ -143,69 +143,71 @@ public class AST {
                 goUpAST();
 
                 break;
-                case "Char List": 
-                    // Char list Case
-                    // Either "a" or "abc"
-                    // Str expression -> Char List -> char ->"" char ->"" char->""
-                    String addChar = ""; // String to accumulated all chars
+            case "Char List": 
+                // Char list Case
+                String addChar = ""; // String to accumulated all chars
+                
+                // Dont Create but move deeper
+                System.out.println("Found " + nodeType + " were adding chars");
+                
+                // update current CST node -> go lower
+                this.myCurrCST = currCSTNode;
 
-                    // Dont Create but move deeper
-                    System.out.println("Found " + nodeType + " were adding chars");
-
-                    // No update for AST nodes because no new ones created
-
-                    // update current CST node -> go lower
-                    this.myCurrCST = currCSTNode;
-
-                    // Recursively call on children of currCST node
-                    for(Node currChar : this.myCurrCST.getChildren()) { 
-                        for(Node charContents : currChar.getChildren()) {
-                            addChar += charContents.getType();
-                        }
+                // Recursively call on children of currCST node
+                for(Node currChar : this.myCurrCST.getChildren()) { 
+                    for(Node charContents : currChar.getChildren()) {
+                        addChar += charContents.getType();
                     }
+                }
+                
+                // add Quotes for clarification
+                addChar = "\"" + addChar + "\"";
 
-                    // Create the node
-                    Node newChar = new Node(addChar, "leaf", this.myCurrAST);
+                // Create the node
+                Node newChar = new Node(addChar, "leaf", this.myCurrAST);
 
-                    // Add to parent node
-                    this.myCurrAST.addChild(newChar);
+                // Add to parent node
+                this.myCurrAST.addChild(newChar);
                     
-                    // Move up?
-                    goUpCST();
-                    break;
+                // Move up CST
+                goUpCST();
+
+                break;
             default:
-                // Checking here due to weird glitch in switch
+
+                // Checking outside of swich due to glitch :/
                 if(nodeType.equalsIgnoreCase("Boolean Expression")) {
                     // Dont Create but move deeper
                     System.out.println("Found " + nodeType + " were going deeper");
 
-                    // No update for AST nodes because no new ones created
-
                     // update current CST node
                     this.myCurrCST = currCSTNode;
 
-                    // Special case because we have EXPR OP EXPR -> need to find and add EXPR FIRST
+                    // Call Special Case Method
                     booleanCase();
+
                     // Recursively call on chilren of currCST node
                     for(Node child : this.myCurrCST.getChildren()) {
                         createAST(child);
                     }
-                    // Move up?
+
+                    // Move up Both
                     goUpCST();
                     goUpAST();
+
                 } else {
-                        // Check for matching char
+
+                    // Check for char
                     for(int i = 0; i < this.gramChar.length; i++) {
                         if(nodeType.equalsIgnoreCase(gramChar[i])) {
                             foundDigChar = true;
                         }
                     }
 
-                    // Check for matching digit
+                    // Check for digit
                     for(int i = 0; i < this.gramDigit.length; i++) {
                         if(nodeType.equalsIgnoreCase(String.valueOf(gramDigit[i]))) {
                             foundDigChar = true;
-                            digit = true;
                         }
                     }
 
@@ -217,11 +219,8 @@ public class AST {
                         // add leaf node to AST
                         this.myCurrAST.addChild(newFound);
 
-                        // Move up?
+                        // Move up CST
                         goUpCST();
-                        if(digit) {
-                            //goUpAST(); // add extra go up if we go deep for digit
-                        }
                     }
                 }
                 break;
@@ -230,10 +229,8 @@ public class AST {
 
     // Method to correctly store the unique boolean case
     public void booleanCase() {
-        // We have Boolean Expr ::== Expr BoolOp Expr
-        // Need to find and add BoolOp type to AST FIRST
+        // Boolean case is stored expr boolop expr -> need to reach ahead and pull boolop first
 
-        // When this is called current node is 
         // Find, Identify and Add BoolOp
         for(Node child : this.myCurrCST.getChildren()) {
             // Find the Child which is 'Bool Op'
@@ -241,18 +238,23 @@ public class AST {
                 // its child will be the operator
                 for(Node operator : child.getChildren()) {
                     if(operator.getType().equalsIgnoreCase("==")) {
-                        // Add Boolop ==
+
+                        // Create node
                         Node newFound = new Node("isEq", "Branch", myCurrAST);
                         System.out.println("Created isEq");
+
                         // add leaf node to AST
                         this.myCurrAST.addChild(newFound);
 
                         // update current AST
                         this.myCurrAST = newFound;
+
                     } else if(operator.getType().equalsIgnoreCase("!=")) {
-                        // Add Boolop !=
+                        
+                        // Create node
                         Node newFound = new Node("isNotEq", "Branch", myCurrAST);
                         System.out.println("Created isEq");
+
                         // add leaf node to AST
                         this.myCurrAST.addChild(newFound);
 
@@ -264,6 +266,15 @@ public class AST {
         }
     }
 
+    //! End AST Construction and Manipulation
+
+    //! Begin AST Methods
+
+    // Getter Method
+    public Node getRoot() {
+        return this.myASTRoot;
+    }
+    
     // Method to go up the CST
     public void goUpCST() {
         if(this.myCurrCST.getParent() != null) {
@@ -284,9 +295,25 @@ public class AST {
         }
     }
 
-    //! End AST Construction and Manipulation
+    // Recursive method to print the CST to the console
+    public void displayAST(Node currNode, int currDepth) {
+        // Print a '-' for each depth per example
+        for(int i = 0; i < currDepth; i++) {
+            System.out.print("-");
+        }
 
-    //! Begin AST Methods
-
+        // if leaf node print accordingly
+        if(currNode.getChildren().size() == 0) {
+            System.out.println("[" + currNode.getType() + "]");
+        } else {
+            // print type
+            System.out.println("<" + currNode.getType() + ">");
+            
+            // Recursively call the method on the children of the curr node
+            for(Node child : currNode.getChildren()) {
+            displayAST(child, currDepth + 1);
+            }
+        }
+    }
     //! End AST Methods
 }

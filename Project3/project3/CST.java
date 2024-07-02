@@ -55,7 +55,6 @@ public class CST {
         if(treeType.equalsIgnoreCase("leaf") == false) {
             this.myCurrent = newNode;
         }
-
     }
 
     // Mystery Function to go back up the tree
@@ -85,7 +84,7 @@ public class CST {
             // Recursively call the method on the children of the curr node
             for(Node child : currNode.getChildren()) {
             displayCST(child, currDepth + 1);
-        }
+            }
         }
     }
 

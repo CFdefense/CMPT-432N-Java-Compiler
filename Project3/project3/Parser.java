@@ -22,7 +22,8 @@ public class Parser {
     private Token currentToken; // the current token we are on
     private int errorCount; // the number of errors found
     private boolean foundEnd; // flag to mark if EOP is found to trigger parseResults()
-    private AST myAST;
+    private AST myAST; // AST Instance to create AST from CST
+    private Semantic mySemantic; // Semantic Instance to run Semantic Analysis
 
     //! Begin Parser Construction and Manipulation
 
@@ -44,6 +45,7 @@ public class Parser {
         this.currentToken = null;
         this.foundEnd = false;
         this.myAST = new AST();
+        this.mySemantic = new Semantic();
     }
 
     // Method to read in tokens to parser
@@ -64,6 +66,7 @@ public class Parser {
         System.out.println("PARSER CLEARED... \n");
         this.foundEnd = false;
         this.myAST.clear();
+        this.mySemantic.clear();
     }
 
     // Method to get next token from stream -> increment instructionCount
@@ -81,14 +84,16 @@ public class Parser {
         if(this.foundEnd == true && this.errorCount == 0) {
             System.out.println("PARSE SUCCESSFULLY COMPLETED WITH " + errorCount + " Error(s)");
             
-            System.out.println("Displaying Concrete Syntax Tree...");
+            System.out.println("DISPLAYING CONCRETE SYNTAX TREE...");
             myTree.displayCST(myTree.getRoot(), 0);
 
             // load and create AST
-            System.out.println("Creating Abstract Syntax Tree...");
+            System.out.println("CREATING ABSTRACT SYNTAX TREE...");
             myAST.loadAST(myTree);
 
-            // Maybe Do Semantic Analysis here
+            // load and start semantic analysis
+            System.out.println("LOADING AST INTO SEMANTIC...")
+            this.mySemantic.loadAST(myAST);
 
 
         } else if(this.foundEnd != true) {

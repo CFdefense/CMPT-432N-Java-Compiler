@@ -33,6 +33,14 @@ public class Node {
         myChildren = new ArrayList<Node>();
     }
 
+    // Full Constructor
+    public Node(String newType, String newTreeType, Node newParent) {
+        myType = newType;
+        myTreeType = newTreeType;
+        myParent = newParent;
+        myChildren = new ArrayList<Node>();
+    }
+
     //! End Node Construction
 
     //! Begin Node Methods

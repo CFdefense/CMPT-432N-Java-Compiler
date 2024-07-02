@@ -2,7 +2,7 @@
     Token Object to be generated from Lexical Anaylsis
     Tokens hold a type, lexeme and the line in which they were read from.
 */
-
+C:\Users\CFdef\Documents\GitHub\Compiler\Project3\testfiles\test6.txt
 package project1;
 
 public class Token {

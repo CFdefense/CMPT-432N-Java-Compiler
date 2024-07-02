@@ -22,4 +22,9 @@ Warnings -> declared but unused identifiers, use of unitialized variables, initi
 --TODO--
 
 Debug and complete AST creation
-test strings and implement go up
+test strings and implement go up add '=='
+
+Semantic Analysis look at slides 45-133
+fix a = "a" not working on a logged
+-> need use hashTable id|type,isInit,isUsed
+-> need scope tree (enhanced symbol table)

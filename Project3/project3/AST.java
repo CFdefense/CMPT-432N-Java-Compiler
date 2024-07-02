@@ -58,6 +58,7 @@ public class AST {
         // Instance Variable for Type of CST Node
         String nodeType = currCSTNode.getType();
         boolean foundDigChar = false;
+        boolean digit = false;
 
         // check for types -> these will create a node and continue down
         switch(nodeType) {
@@ -83,11 +84,11 @@ public class AST {
                 break;
             case "Digit":
             case "ID":
+            case "Type":
             case "Statement List":
             case "Statement":
             case "Expression":
             case "String Expression":
-            case "Char List": // to be fixed?
                 // Dont Create but move deeper
                 System.out.println("Found " + nodeType + " were going deeper");
 
@@ -96,13 +97,13 @@ public class AST {
                 // update current CST node
                 this.myCurrCST = currCSTNode;
 
-                // Recursively call on chilren of currCST node
+                // Recursively call on children of currCST node
                 for(Node child : this.myCurrCST.getChildren()) {
                     createAST(child);
                 }
                 
                 // Move up?
-
+                goUpCST();
                 break;
             case "Block":
             case "VarDecl":
@@ -113,10 +114,14 @@ public class AST {
             case "boolean":
             case "IF Statement":
             case "While Statement":
-            case "Boolean Expression":
             case "Int Expression":
                 // create the node to be added
-                Node newNode = new Node(nodeType,"Branch");
+                Node newNode;
+                if(nodeType.equalsIgnoreCase("int") || nodeType.equalsIgnoreCase("string") || nodeType.equalsIgnoreCase("boolean")) {
+                    newNode = new Node(nodeType,"Leaf", myCurrAST); 
+                } else {
+                    newNode = new Node(nodeType,"Branch", myCurrAST);
+                }
                 System.out.println("Created " + nodeType);
                 
                 // add the created node to the AST
@@ -134,37 +139,151 @@ public class AST {
                 }
 
                 // Move up?
+                goUpCST();
+                goUpAST();
 
-            default:
+                break;
+                case "Char List": 
+                    // Char list Case
+                    // Either "a" or "abc"
+                    // Str expression -> Char List -> char ->"" char ->"" char->""
+                    String addChar = ""; // String to accumulated all chars
 
-                // Check for matching char
-                for(int i = 0; i < this.gramChar.length; i++) {
-                    if(nodeType.equalsIgnoreCase(gramChar[i])) {
-                        foundDigChar = true;
+                    // Dont Create but move deeper
+                    System.out.println("Found " + nodeType + " were adding chars");
+
+                    // No update for AST nodes because no new ones created
+
+                    // update current CST node -> go lower
+                    this.myCurrCST = currCSTNode;
+
+                    // Recursively call on children of currCST node
+                    for(Node currChar : this.myCurrCST.getChildren()) { 
+                        for(Node charContents : currChar.getChildren()) {
+                            addChar += charContents.getType();
+                        }
                     }
-                }
 
-                // Check for matching digit
-                for(int i = 0; i < this.gramDigit.length; i++) {
-                    if(nodeType.equalsIgnoreCase(String.valueOf(gramDigit[i]))) {
-                        foundDigChar = true;
-                    }
-                }
+                    // Create the node
+                    Node newChar = new Node(addChar, "leaf", this.myCurrAST);
 
-                // if we have identified the type to be of a char or digit
-                if(foundDigChar) {
-                    // create new leaf node
-                    Node newFound = new Node(nodeType, "leaf");
-                    System.out.println("Created " + nodeType);
-                    // add leaf node to AST
-                    this.myCurrAST.addChild(newFound);
-
+                    // Add to parent node
+                    this.myCurrAST.addChild(newChar);
+                    
                     // Move up?
-                }
+                    goUpCST();
+                    break;
+            default:
+                // Checking here due to weird glitch in switch
+                if(nodeType.equalsIgnoreCase("Boolean Expression")) {
+                    // Dont Create but move deeper
+                    System.out.println("Found " + nodeType + " were going deeper");
 
+                    // No update for AST nodes because no new ones created
+
+                    // update current CST node
+                    this.myCurrCST = currCSTNode;
+
+                    // Special case because we have EXPR OP EXPR -> need to find and add EXPR FIRST
+                    booleanCase();
+                    // Recursively call on chilren of currCST node
+                    for(Node child : this.myCurrCST.getChildren()) {
+                        createAST(child);
+                    }
+                    // Move up?
+                    goUpCST();
+                    goUpAST();
+                } else {
+                        // Check for matching char
+                    for(int i = 0; i < this.gramChar.length; i++) {
+                        if(nodeType.equalsIgnoreCase(gramChar[i])) {
+                            foundDigChar = true;
+                        }
+                    }
+
+                    // Check for matching digit
+                    for(int i = 0; i < this.gramDigit.length; i++) {
+                        if(nodeType.equalsIgnoreCase(String.valueOf(gramDigit[i]))) {
+                            foundDigChar = true;
+                            digit = true;
+                        }
+                    }
+
+                    // if we have identified the type to be of a char or digit
+                    if(foundDigChar) {
+                        // create new leaf node
+                        Node newFound = new Node(nodeType, "leaf", myCurrAST);
+                        System.out.println("Created " + nodeType);
+                        // add leaf node to AST
+                        this.myCurrAST.addChild(newFound);
+
+                        // Move up?
+                        goUpCST();
+                        if(digit) {
+                            //goUpAST(); // add extra go up if we go deep for digit
+                        }
+                    }
+                }
                 break;
         }
     }
+
+    // Method to correctly store the unique boolean case
+    public void booleanCase() {
+        // We have Boolean Expr ::== Expr BoolOp Expr
+        // Need to find and add BoolOp type to AST FIRST
+
+        // When this is called current node is 
+        // Find, Identify and Add BoolOp
+        for(Node child : this.myCurrCST.getChildren()) {
+            // Find the Child which is 'Bool Op'
+            if(child.getType().equalsIgnoreCase("Boolean Operator")) {
+                // its child will be the operator
+                for(Node operator : child.getChildren()) {
+                    if(operator.getType().equalsIgnoreCase("==")) {
+                        // Add Boolop ==
+                        Node newFound = new Node("isEq", "Branch", myCurrAST);
+                        System.out.println("Created isEq");
+                        // add leaf node to AST
+                        this.myCurrAST.addChild(newFound);
+
+                        // update current AST
+                        this.myCurrAST = newFound;
+                    } else if(operator.getType().equalsIgnoreCase("!=")) {
+                        // Add Boolop !=
+                        Node newFound = new Node("isNotEq", "Branch", myCurrAST);
+                        System.out.println("Created isEq");
+                        // add leaf node to AST
+                        this.myCurrAST.addChild(newFound);
+
+                        // update current AST
+                        this.myCurrAST = newFound;
+                    }
+                }
+            }
+        }
+    }
+
+    // Method to go up the CST
+    public void goUpCST() {
+        if(this.myCurrCST.getParent() != null) {
+            this.myCurrCST = this.myCurrCST.getParent();
+        } else {
+            // Throw error if reached root before we should have
+            System.out.println("ERROR - COULD NOT MOVE UP CST");
+        }
+    }
+
+    // Method to go up AST
+    public void goUpAST() {
+        if(this.myCurrAST.getParent() != null) {
+            this.myCurrAST = this.myCurrAST.getParent();
+        } else {
+            // Throw error if reached root before we should have
+            System.out.println("ERROR - COULD NOT MOVE UP AST");
+        }
+    }
+
     //! End AST Construction and Manipulation
 
     //! Begin AST Methods

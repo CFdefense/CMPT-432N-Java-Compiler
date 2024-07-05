@@ -7,6 +7,8 @@
 */
 package project3;
 
+import java.util.ArrayList;
+
 public class Semantic {
     
     // Private Instance Variables
@@ -45,6 +47,12 @@ public class Semantic {
 
         // Determine What Type
         switch(currentType) {
+            case "Program":
+                // IF program continue down
+                for(Node child : currNode.getChildren()) {
+                    SemanticAnalysis(child, currScope);
+                }
+                break;
             case "Block":
                 // IF new Block, create and add to our Symbol Table
                 SymbolNode newSymbolNode = new SymbolNode(currScope);
@@ -54,20 +62,66 @@ public class Semantic {
                 for(Node child : currNode.getChildren()) {
                     SemanticAnalysis(child, currScope + 1);
                 }
+                // Go up?
                 break;
             case "VarDecl":
-            case "Assignment":
-            case "Print":
-            case "IF Statement":
-            case "Int Expression":
-            case "isEq":
-            case "isNotEq":
-                //Maybe more to test childs
+                // No type checking just creating symbol and adding to current symbol node
 
-                
+                // Get the children of VarDecl
+                ArrayList<Node> currVarDecl = currNode.getChildren();
+
+                // Create symbol as first child is type and second is ID
+                this.mySymbolTable.createSymbol(currVarDecl.get(0).getType(), currVarDecl.get(1).getType());
+
+                break;
+            case "Assignment":
+                // Check for declaration and type check
+                // Error rn -> second child is 'int expr'
+                // Get the children of assign
+                ArrayList<Node> currAssign = currNode.getChildren();
+
+                // First Child is the ID, check it has been declared
+                Symbol findings = this.mySymbolTable.search(currAssign.get(0).getType());
+                if(findings != null) {
+                    // if findings arent null we continue to type check
+
+                    // get current type
+                    String currType = findings.getType();
+                    boolean isValid = false;
+
+                    // Switch type with expected values
+                    switch(currType) {
+                        case "int":
+
+                        break;
+                        case "string":
+
+                        break;
+                        case "boolean":
+
+                        break;
+                    }
+                    
+                } else {
+                    // ID could not be found
+                    System.out.println("ERROR ID [ " + currAssign.get(0).getType() + " ] UNDECLARED WITHIN SCOPE");
+                    this.errorCount++;
+                }
+                break;
+            case "isEq":
+                // Check for declaration and type check
+            case "isNotEq":
+                // Check for declaration and type check
+            case "Print":
+                // Check for declaration
+            case "IF Statement":
+                // Traverse down
+            case "Int Expression":
+                // Traverse down    
         }
 
         // Otherwise traverse deeper looking for VarDecl,Assign,Print,If,isEq,isNotEq,etc
+
 
     }
 

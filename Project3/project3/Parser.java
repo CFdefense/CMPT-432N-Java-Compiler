@@ -92,7 +92,7 @@ public class Parser {
             myAST.loadAST(myTree);
 
             // load and start semantic analysis
-            System.out.println("LOADING AST INTO SEMANTIC...")
+            System.out.println("LOADING AST INTO SEMANTIC...");
             this.mySemantic.loadAST(myAST);
 
 

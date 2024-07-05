@@ -40,9 +40,13 @@ public class SymbolNode {
         this.myParent = newParent;
     }
 
-    // Getter Method
+    // Getter Methods
     public SymbolNode getParent() {
         return this.myParent;
+    }
+
+    public int getScope() {
+        return this.myScope;
     }
 
     // Method to add children
@@ -51,7 +55,22 @@ public class SymbolNode {
     }
 
     // Method to add create and add symbol
-    public void addSymbol(String newType, int newLineNumber) {
-        mySymbols.put("", new Symbol(newType, newLineNumber));
+    public void addSymbol(String newType, String newKey) {
+        mySymbols.put(newKey, new Symbol(newType));
+    }
+
+    // Method to see if ID has been declared
+    public Symbol searchID(String ID) {
+        Symbol result = null;
+
+        // Lookup key value -> returns symbol or null if DNE
+        Symbol findings = mySymbols.get(ID);
+
+        // See if it exists and update results accordingly
+        if(findings != null) {
+            result = findings;
+        }
+
+        return result;
     }
 }

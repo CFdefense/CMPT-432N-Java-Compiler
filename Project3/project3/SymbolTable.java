@@ -38,4 +38,31 @@ public class SymbolTable {
         this.myCurrent = newNode;
     }
 
+    // Method to create a new symbol
+    public void createSymbol(String newType, String newKey) {
+
+        // Call current scopes add method
+        this.myCurrent.addSymbol(newType, newKey);
+    }
+
+    // Method to identify if a var has been declared
+    public Symbol search(String findID) {
+        Symbol result = null;
+
+        // We need to check the current scope and any parent scopes for this variable
+        SymbolNode currentNode = this.myCurrent;
+
+        // While were not at scope 0
+        while (currentNode != null) {
+            // Check current scope for the ID
+            if (currentNode.searchID(findID) != null) {
+                result = currentNode.searchID(findID);
+                break;
+            }
+
+            // Get Parent Scope
+            currentNode = currentNode.getParent();
+        }
+        return result;
+    }
 }

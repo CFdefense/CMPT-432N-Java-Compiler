@@ -13,7 +13,6 @@ public class Symbol {
     private boolean isInit; // if Symbol has been initialized
     private boolean isUsed; // if Symbol has been used
     private int myScope; // Could be a SymbolNode object ie parent?
-    private int lineNumber; // Line number of Symbol
 
     // Null Constructor
     public Symbol() {
@@ -22,17 +21,20 @@ public class Symbol {
         this.isInit = false;
         this.isUsed = false;
         this.myScope = 0;
-        this.lineNumber = 0;
     }
 
     // Semi Constructor -> maybe init other vars TBD
-    public Symbol(String newType, int newLineNumber) {
+    public Symbol(String newType) {
         this.myName = null;
         this.myType = newType;
         this.isInit = false;
         this.isUsed = false;
         this.myScope = 0;
-        this.lineNumber = newLineNumber;
+    }
+
+    // getter functions
+    public String getType() {
+        return this.myType;
     }
 
     // Setter functions

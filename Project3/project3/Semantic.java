@@ -65,8 +65,6 @@ public class Semantic {
                 // Go up?
                 break;
             case "VarDecl":
-                // No type checking just creating symbol and adding to current symbol node
-
                 // Get the children of VarDecl
                 ArrayList<Node> currVarDecl = currNode.getChildren();
 
@@ -76,7 +74,8 @@ public class Semantic {
                 break;
             case "Assignment":
                 // Check for declaration and type check
-                // Error rn -> second child is 'int expr'
+                // Assignment is ID = EXPR where expr can be 1 or 1 + 2
+
                 // Get the children of assign
                 ArrayList<Node> currAssign = currNode.getChildren();
 
@@ -84,20 +83,37 @@ public class Semantic {
                 Symbol findings = this.mySymbolTable.search(currAssign.get(0).getType());
                 if(findings != null) {
                     // if findings arent null we continue to type check
-
                     // get current type
                     String currType = findings.getType();
-                    boolean isValid = false;
 
                     // Switch type with expected values
                     switch(currType) {
                         case "int":
-
+                            // Int expression case
+                            
                         break;
                         case "string":
+                            // String case either a or "something"
+                            boolean result = false;
 
-                        break;
-                        case "boolean":
+                            // Look to see if second index is a valid declared id
+                            Symbol findingsString = this.mySymbolTable.search(currAssign.get(1).getType());
+
+                            // Short circuit evaluation to check if index is a valid id and of type string
+                            if(findingsString != null && findingsString.getType().equalsIgnoreCase("string")) {
+                                result = true;
+                            }
+                            
+                            // Otherwise check if there are quotes at the front and the back
+                            if(currAssign.get(1).getType().charAt(0) == '\"' || currAssign.get(1).getType().charAt(currAssign.get(1).getType().length() - 1) == '\"') {
+                                result = true;
+                            }
+
+                            // Output results
+                            if(result != true) {
+                                System.out.println("ERROR Type-Mismatch - Expected String Variation but found " + findingsString.getType());
+                                this.errorCount++;
+                            }
 
                         break;
                     }

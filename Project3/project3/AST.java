@@ -65,7 +65,7 @@ public class AST {
         switch(nodeType) {
             case "Program":
                 // Create new node
-                System.out.println("Creating Program");
+                System.out.println("Creating Program AST");
                 Node newASTNode = new Node("Program", "root");
 
                 // Set AST root as this new node
@@ -91,7 +91,6 @@ public class AST {
             case "Expression":
             case "String Expression":
                 // Dont Create but move deeper
-                System.out.println("Found " + nodeType + " were going deeper");
 
                 // update current CST node
                 this.myCurrCST = currCSTNode;
@@ -122,7 +121,6 @@ public class AST {
                 } else {
                     newNode = new Node(nodeType,"Branch", myCurrAST);
                 }
-                System.out.println("Created " + nodeType);
                 
                 // add the created node to the AST
                 this.myCurrAST.addChild(newNode);
@@ -148,7 +146,6 @@ public class AST {
                 String addChar = ""; // String to accumulated all chars
                 
                 // Dont Create but move deeper
-                System.out.println("Found " + nodeType + " were adding chars");
                 
                 // update current CST node -> go lower
                 this.myCurrCST = currCSTNode;
@@ -178,7 +175,6 @@ public class AST {
                 // Checking outside of swich due to glitch :/
                 if(nodeType.equalsIgnoreCase("Boolean Expression")) {
                     // Dont Create but move deeper
-                    System.out.println("Found " + nodeType + " were going deeper");
 
                     // update current CST node
                     this.myCurrCST = currCSTNode;
@@ -215,7 +211,7 @@ public class AST {
                     if(foundDigChar) {
                         // create new leaf node
                         Node newFound = new Node(nodeType, "leaf", myCurrAST);
-                        System.out.println("Created " + nodeType);
+
                         // add leaf node to AST
                         this.myCurrAST.addChild(newFound);
 
@@ -241,7 +237,6 @@ public class AST {
 
                         // Create node
                         Node newFound = new Node("isEq", "Branch", myCurrAST);
-                        System.out.println("Created isEq");
 
                         // add leaf node to AST
                         this.myCurrAST.addChild(newFound);
@@ -253,7 +248,6 @@ public class AST {
                         
                         // Create node
                         Node newFound = new Node("isNotEq", "Branch", myCurrAST);
-                        System.out.println("Created isEq");
 
                         // add leaf node to AST
                         this.myCurrAST.addChild(newFound);

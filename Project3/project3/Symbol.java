@@ -37,6 +37,10 @@ public class Symbol {
         return this.myType;
     }
 
+    public String getName() {
+        return this.myName;
+    }
+
     // Setter functions
     public void setName(String newName) {
         this.myName = newName;

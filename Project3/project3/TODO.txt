@@ -23,7 +23,7 @@ Warnings -> declared but unused identifiers, use of unitialized variables, initi
 
 Continue Work for Semantics
 currScope recursion might be off
-Do Init changes!
+Do Init changes ! Check Scope Clarity
 
 -> need use hashTable id|type,isInit,isUsed
 -> need scope tree (enhanced symbol table)

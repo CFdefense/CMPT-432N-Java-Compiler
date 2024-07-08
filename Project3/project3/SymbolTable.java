@@ -26,6 +26,11 @@ public class SymbolTable {
         this.myCurrent = null;
     }
 
+    // Getter method
+    public SymbolNode getRoot() {
+        return this.myRoot;
+    }
+
     // Method to add node to the correct place
     public void addNode(SymbolNode newNode) {
         // Check if the tree is empty
@@ -74,12 +79,15 @@ public class SymbolTable {
         this.myCurrent = newCurrent;
     }
 
-    public void displaySymbolTable() {
-        // Instance Variables
-        SymbolNode displayCurrent = this.myRoot; // start at the root
+    // Recursive Method to display tree
+    public void displayTree(SymbolNode displayCurrent) {
 
-        // We will print until we cannot go up and print any more
-        while(displayCurrent != null) {
+        // Base Case
+        if(displayCurrent == null) {
+            return;
+        } else {
+            // Recursive Case
+            
             // Output Scope
             System.out.println("--- Scope " + displayCurrent.getScope() + " ---");
 
@@ -91,9 +99,16 @@ public class SymbolTable {
                 String currVar = current.getKey();
                 Symbol currSymbol = current.getValue();
 
-                // Print all Info
-                System.out.println("- " + currVar + " | " + );
+                // Print all Symbol Info
+                System.out.println("- " + currVar + " | " + currSymbol.getType() + ", " + currSymbol.getInit() + ", " + currSymbol.getUsed());
+            
             }
+
+            // Recursive Call on Child Nodes
+            for(SymbolNode child : displayCurrent.getChildren()) {
+                displayTree(child);
+            }
+            
         }
     }
 }

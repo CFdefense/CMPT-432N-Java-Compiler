@@ -97,6 +97,9 @@ public class Parser {
             System.out.println("LOADING AST INTO SEMANTIC...");
             this.mySemantic.loadAST(myAST);
 
+            // Print Symbol Table
+            this.mySemantic.displaySymbolTable();
+
 
         } else if(this.foundEnd != true) {
             System.out.println("PARSE FAILED FAILED WITH " + errorCount + " Error(s) EOP NOT FOUND");

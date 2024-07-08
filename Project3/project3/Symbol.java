@@ -41,6 +41,14 @@ public class Symbol {
         return this.myName;
     }
 
+    public boolean getInit() {
+        return this.isInit;
+    }
+
+    public boolean getUsed() {
+        return this.isUsed;
+    }
+
     // Setter functions
     public void setName(String newName) {
         this.myName = newName;

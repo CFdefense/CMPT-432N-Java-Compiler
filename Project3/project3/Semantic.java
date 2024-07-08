@@ -392,8 +392,10 @@ public class Semantic {
         return nodeType;
     }
 
+    // Method to Display The Symbol Table
     public void displaySymbolTable() {
         System.out.println("Displaying Symbol Table...");
-        this.mySymbolTable.displayTree();
+        this.mySymbolTable.displayTree(this.mySymbolTable.getRoot());
     }
+    
 }

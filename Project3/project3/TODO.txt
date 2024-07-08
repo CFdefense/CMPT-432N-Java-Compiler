@@ -21,7 +21,9 @@ Warnings -> variables declarded/declared and initialized but unused, used variab
 --TODO--
 
 Continue Work for Semantics
-Do Warnings implementation display print hashtable
+1. display print hashtable
+2. Do Warnings implementation 
+3. Work on conclusions of semantic
 
 -> need use hashTable id|type,isInit,isUsed
 -> need scope tree (enhanced symbol table)

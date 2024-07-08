@@ -399,5 +399,5 @@ public class Lexer {
         this.clearLexer();
     }   
     }
-}   
+}
 //! End of Lexical Anaylsis (Scanner)

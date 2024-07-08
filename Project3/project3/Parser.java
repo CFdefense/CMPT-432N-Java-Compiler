@@ -65,7 +65,9 @@ public class Parser {
         this.errorCount = 0;
         System.out.println("PARSER CLEARED... \n");
         this.foundEnd = false;
-        this.myAST.clear();
+        if(this.myAST.getRoot() != null) {
+            this.myAST.clear();
+        }
         this.mySemantic.clear();
     }
 

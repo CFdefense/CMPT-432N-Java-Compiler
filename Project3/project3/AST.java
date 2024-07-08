@@ -90,6 +90,8 @@ public class AST {
             case "Statement":
             case "Expression":
             case "String Expression":
+            case "Int Expression":
+            case "Boolean Value":
                 // Dont Create but move deeper
 
                 // update current CST node
@@ -113,7 +115,6 @@ public class AST {
             case "boolean":
             case "IF Statement":
             case "While Statement":
-            case "Int Expression":
                 // create the node to be added
                 Node newNode;
                 if(nodeType.equalsIgnoreCase("int") || nodeType.equalsIgnoreCase("string") || nodeType.equalsIgnoreCase("boolean")) {
@@ -174,22 +175,39 @@ public class AST {
 
                 // Checking outside of swich due to glitch :/
                 if(nodeType.equalsIgnoreCase("Boolean Expression")) {
-                    // Dont Create but move deeper
+                    // Dont Create but move deeper for one case
+                    boolean boolCase = false;
 
-                    // update current CST node
-                    this.myCurrCST = currCSTNode;
+                    // Determine if boolean value
+                    for(Node child : currCSTNode.getChildren()) {
+                        if(child.getType().equalsIgnoreCase("Boolean Value")) {
+                            boolCase = true;
+                        }
+                    }
 
                     // Call Special Case Method
-                    booleanCase();
+                    if(!boolCase) {
+                        // update current CST node
+                        this.myCurrCST = currCSTNode;
 
-                    // Recursively call on chilren of currCST node
+                        // Call special case
+                        booleanCase();
+                    } else {
+                        // update current CST node
+                        this.myCurrCST = currCSTNode;
+                    }
+                    
+                    // Recursively call on children of currCST node
                     for(Node child : this.myCurrCST.getChildren()) {
                         createAST(child);
                     }
-
+                    
+                
                     // Move up Both
                     goUpCST();
-                    goUpAST();
+                    if(!boolCase) {
+                        goUpAST();
+                    }
 
                 } else {
 
@@ -205,6 +223,16 @@ public class AST {
                         if(nodeType.equalsIgnoreCase(String.valueOf(gramDigit[i]))) {
                             foundDigChar = true;
                         }
+                    }
+
+                    // Check if bool value
+                    if(nodeType.equalsIgnoreCase("true") || nodeType.equalsIgnoreCase("false")) {
+                        // create new leaf node
+                        Node newFound = new Node(nodeType, "leaf", myCurrAST);
+
+                        // add leaf node to AST
+                        this.myCurrAST.addChild(newFound);
+
                     }
 
                     // if we have identified the type to be of a char or digit

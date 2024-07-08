@@ -28,20 +28,20 @@ public class Parser {
     // Null Constructor
     public Parser() {
         // Initialize Private Variables
-        myTokens = new ArrayList<Token>();
-        gramType = new String[]{"int", "string", "boolean"};
-        gramChar = new String[26];
+        this.myTokens = new ArrayList<Token>();
+        this.gramType = new String[]{"int", "string", "boolean"};
+        this.gramChar = new String[26];
         for (char c = 'a'; c <= 'z'; c++) {
-            gramChar[c - 'a'] = String.valueOf(c); // using ASCII
+            this.gramChar[c - 'a'] = String.valueOf(c); // using ASCII
         }
-        gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-        gramBoolOp = new String[]{"==", "!="};
-        gramBoolVal = new String[]{"false", "true"};
+        this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        this.gramBoolOp = new String[]{"==", "!="};
+        this.gramBoolVal = new String[]{"false", "true"};
 
-        myTree = new CST();
-        instructionCount = 0;
-        currentToken = null;
-        foundEnd = false;
+        this.myTree = new CST();
+        this.instructionCount = 0;
+        this.currentToken = null;
+        this.foundEnd = false;
     }
 
     // Method to read in tokens to parser
@@ -61,7 +61,6 @@ public class Parser {
         this.errorCount = 0;
         System.out.println("PARSER CLEARED... \n");
         this.foundEnd = false;
-        
     }
 
     // Method to get next token from stream -> increment instructionCount
@@ -78,8 +77,13 @@ public class Parser {
         // errorcount 
         if(this.foundEnd == true && this.errorCount == 0) {
             System.out.println("PARSE SUCCESSFULLY COMPLETED WITH " + errorCount + " Error(s)");
+            
+            System.out.println("DISPLAYING CONCRETE SYNTAX TREE...");
             myTree.displayCST(myTree.getRoot(), 0);
-            // INSERT NEXT COMPILER PART START
+
+            // AST HERE
+
+
         } else if(this.foundEnd != true) {
             System.out.println("PARSE FAILED FAILED WITH " + errorCount + " Error(s) EOP NOT FOUND");
             System.out.println("CST WILL NOT BE PRINTED");

@@ -17,6 +17,7 @@ public class Semantic {
     private int errorCount; // Count for # of Errors
     private int warningCount; // Count for # of Warnings
     private SymbolTable mySymbolTable; // Instance of Symbol Table
+    private int[] gramDigit; // Acceptable digit values
 
     // Null Constructor
     public Semantic() {
@@ -25,6 +26,7 @@ public class Semantic {
         this.warningCount = 0;
         this.currentNode = null;
         this.mySymbolTable = new SymbolTable();
+        this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     }
 
     // Method to load in AST and begin Semantic Anaylsis
@@ -74,76 +76,104 @@ public class Semantic {
                 break;
             case "Assignment":
                 // Check for declaration and type check
-                // Assignment is ID = EXPR where expr can be 1 or 1 + 2
 
                 // Get the children of assign
                 ArrayList<Node> currAssign = currNode.getChildren();
 
                 // First Child is the ID, check it has been declared
                 Symbol findings = this.mySymbolTable.search(currAssign.get(0).getType());
+
+                // Boolean for result
+                boolean overallResult = true;
+
+                // It has been declared
                 if(findings != null) {
-                    // if findings arent null we continue to type check
-                    // get current type
-                    String currType = findings.getType();
-
-                    // Switch type with expected values
-                    switch(currType) {
+                    switch(findings.getType()) {
                         case "int":
-                            // Int expression case
-                            
-                        break;
+                            // Ensure all neighboring children are of the same type
+                            for(Node children : currAssign) {
+                                String childType = children.getType();
+                                boolean localResult = false;
+                                boolean isNum = false;
+                                // Check if it's a digit
+                                try {
+                                    int childValue = Integer.valueOf(childType);
+                                    for (int digit : gramDigit) {
+                                        if (digit == childValue) {
+                                            localResult = true;
+                                            isNum = true;
+                                            break;
+                                        }
+                                    }
+                                } catch (NumberFormatException e) {
+                                    // Not a digit, skip to the next check
+                                }           
+
+                                // Check if its a valid id
+                                Symbol findingsInt = this.mySymbolTable.search(childType);
+
+                                if((findingsInt != null && findingsInt.getType().equalsIgnoreCase("int")) || isNum) {
+                                    localResult = true;
+                                } else {
+                                    localResult = false;
+                                }
+
+                                // Update overall result if any are false
+                                if(!localResult) {
+                                    overallResult = false;
+                                }
+                            }
+
+                            if(!overallResult) {
+                                System.out.println("ERROR TYPE MISMATCH FOR Integer [ " + currAssign.get(0).getType() + " ]");
+                            }
+
                         case "string":
-                            // String case either a or "something"
-                            boolean result = false;
+                            // Ensure all neighboring children are of the same type
+                            for(Node children : currAssign) {
+                                String childType = children.getType();
+                                boolean localResult = false;
+                                // Check if it's a string be seeing if first and last are quotes
+                                if(childType.charAt(0) == ('\"') && childType.charAt(childType.length() - 1) == ('\"')) {
+                                    localResult = true;
+                                } else {
+                                    // Otherwise Check if its a valid id
+                                    Symbol findingsStr = this.mySymbolTable.search(childType);
 
-                            // Look to see if second index is a valid declared id
-                            Symbol findingsString = this.mySymbolTable.search(currAssign.get(1).getType());
+                                    if((findingsStr != null && findingsStr.getType().equalsIgnoreCase("string"))) {
+                                        localResult = true;
+                                    } else {
+                                        localResult = false;
+                                    }
+                                }
 
-                            // Short circuit evaluation to check if index is a valid id and of type string
-                            if(findingsString != null && findingsString.getType().equalsIgnoreCase("string")) {
-                                result = true;
+                                // Update overall result if any are false
+                                if(!localResult) {
+                                    overallResult = false;
+                                }
                             }
+
+                            if(!overallResult) {
+                                System.out.println("ERROR TYPE MISMATCH FOR String [ " + currAssign.get(0).getType() + " ]");
+                            }
+
+                        case "boolean":
+                            // Ensure all neighboring children are of the same type
                             
-                            // Otherwise check if there are quotes at the front and the back
-                            if(currAssign.get(1).getType().charAt(0) == '\"' || currAssign.get(1).getType().charAt(currAssign.get(1).getType().length() - 1) == '\"') {
-                                result = true;
-                            }
 
-                            // Output results
-                            if(result != true) {
-                                System.out.println("ERROR Type-Mismatch - Expected String Variation but found " + findingsString.getType());
-                                this.errorCount++;
-                            }
-
-                        break;
                     }
-                    
+                
                 } else {
-                    // ID could not be found
-                    System.out.println("ERROR ID [ " + currAssign.get(0).getType() + " ] UNDECLARED WITHIN SCOPE");
+                    // It has not been declared throw error
+                    System.out.println("ERROR UNDECLARED VARIABLE [ " + currAssign.get(0) + " ]");
                     this.errorCount++;
                 }
-                break;
-            case "isEq":
-                // Check for declaration and type check
-            case "isNotEq":
-                // Check for declaration and type check
-            case "Print":
-                // Check for declaration
-            case "IF Statement":
-                // Traverse down
-            case "Int Expression":
-                // Traverse down    
+
+            }       
         }
-
-        // Otherwise traverse deeper looking for VarDecl,Assign,Print,If,isEq,isNotEq,etc
-
-
-    }
 
     // Method to clear Semantic
     public void clear() {
-        this.myAST.clear();
         this.errorCount = 0;
         this.warningCount = 0;
         this.currentNode = null;

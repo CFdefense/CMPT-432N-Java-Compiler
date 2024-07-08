@@ -14,6 +14,7 @@ public class Semantic {
     // Private Instance Variables
     private AST myAST; // AST to run Semantic Anaylsis on
     private SymbolNode currentNode; // Current Symbol Node(Scope) Were On
+    private SymbolNode previousNode; // Previous Node to go back to
     private int errorCount; // Count for # of Errors
     private int warningCount; // Count for # of Warnings
     private SymbolTable mySymbolTable; // Instance of Symbol Table
@@ -25,6 +26,7 @@ public class Semantic {
         this.errorCount = 0;
         this.warningCount = 0;
         this.currentNode = null;
+        this.previousNode = null;
         this.mySymbolTable = new SymbolTable();
         this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     }
@@ -62,10 +64,22 @@ public class Semantic {
                 SymbolNode newSymbolNode = new SymbolNode(currScope);
                 this.mySymbolTable.addNode(newSymbolNode);
 
+                // Save previous Block to go back down later
+                this.previousNode = this.currentNode;
+
+                // Update Current Block
+                this.currentNode = newSymbolNode;
+
                 // Traverse Down the Block
                 for(Node child : currNode.getChildren()) {
                     SemanticAnalysis(child, currScope + 1);
                 }
+
+                // Go back down
+                this.currentNode = this.previousNode;
+                this.mySymbolTable.setCurrent(this.currentNode);
+
+                
                 break;
             case "VarDecl":
                 System.out.println("Found VarDecl");
@@ -180,7 +194,7 @@ public class Semantic {
 
                 } else {
                     // It has not been declared throw error
-                    System.out.println("ERROR UNDECLARED VARIABLE [ " + currAssign.get(0) + " ]");
+                    System.out.println("ERROR UNDECLARED VARIABLE [ " + currAssign.get(0).getType() + " ]");
                     this.errorCount++;
                 }
                 break;
@@ -380,6 +394,6 @@ public class Semantic {
 
     public void displaySymbolTable() {
         System.out.println("Displaying Symbol Table...");
-
+        this.mySymbolTable.displayTree();
     }
 }

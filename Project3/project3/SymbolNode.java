@@ -49,6 +49,10 @@ public class SymbolNode {
         return this.myScope;
     }
 
+    public Hashtable<String, Symbol> getSymbols() {
+        return this.mySymbols;
+    }
+
     // Method to add children
     public void addChild(SymbolNode newChild) {
         this.myChildren.add(newChild);

@@ -10,20 +10,18 @@ Project 3 - AST and Semantic Analysis
 
 Important::
 While Scope-Checking 
-    -> build symbol table of IDS which includes [Name, datatype, scope, position, etc]
+    -> build symbol table of Symbols which includes [Name, datatype, scope, position, etc]
 
 Type check source code using AST and symbol table
 
 Errors -> undeclared identifiers, redeclared identifiers in same scope, type mismatch, etc.
 
-Warnings -> declared but unused identifiers, use of unitialized variables, initialized used variables
-
+Warnings -> variables declarded/declared and initialized but unused, used variables without initialization
 
 --TODO--
 
 Continue Work for Semantics
-currScope recursion might be off
-Do Init changes ! Check Scope Clarity
+Do Warnings implementation display print hashtable
 
 -> need use hashTable id|type,isInit,isUsed
 -> need scope tree (enhanced symbol table)

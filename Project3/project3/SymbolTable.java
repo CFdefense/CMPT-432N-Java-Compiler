@@ -5,6 +5,9 @@
 */
 package project3;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 public class SymbolTable {
 
     // Private Instance Varuables
@@ -64,5 +67,33 @@ public class SymbolTable {
             currentNode = currentNode.getParent();
         }
         return result;
+    }
+
+    // Method to update the current symbol node
+    public void setCurrent(SymbolNode newCurrent) {
+        this.myCurrent = newCurrent;
+    }
+
+    public void displaySymbolTable() {
+        // Instance Variables
+        SymbolNode displayCurrent = this.myRoot; // start at the root
+
+        // We will print until we cannot go up and print any more
+        while(displayCurrent != null) {
+            // Output Scope
+            System.out.println("--- Scope " + displayCurrent.getScope() + " ---");
+
+            // Get current SymbolNode's HashTable
+            Hashtable<String, Symbol> currentHash = displayCurrent.getSymbols();
+
+            // Iterate over Hashtable instances
+            for(Map.Entry<String, Symbol> current : currentHash.entrySet()) {
+                String currVar = current.getKey();
+                Symbol currSymbol = current.getValue();
+
+                // Print all Info
+                System.out.println("- " + currVar + " | " + );
+            }
+        }
     }
 }

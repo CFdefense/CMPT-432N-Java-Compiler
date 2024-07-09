@@ -26,6 +26,7 @@ public class Lexer {
     private boolean foundEnd; // boolean to determine if weve hit an EOP
     private boolean foundNew; // boolean to determine if were starting a new program
     private Parser myParser; // Parser instance to begin next step of compiling
+    private int myProgramNumber;
     
     //! Begin Lexer Construction and Manipulation
 
@@ -40,7 +41,7 @@ public class Lexer {
         this.foundEnd = false;
         this.foundNew = true;
         this.myParser = new Parser();
-
+        this.myProgramNumber = 0;
     }
     
     // Method for reading in a file
@@ -85,6 +86,7 @@ public class Lexer {
         this.foundNew = true;
         this.foundEnd = false;
         this.myParser.reset();
+        this.myProgramNumber = 0;
     }
 
     //! End of Lexer Construction and Manipulation
@@ -93,7 +95,7 @@ public class Lexer {
 
     public void lexicalAnalysis() {
 
-        System.out.println("Running Lexical Analysis");
+        System.out.println("COMPILER RUNNING... \n");
         
         // Define our Grammer to be used by regex pattern detection
         String ids = "[a-z]"; // regex a through z 
@@ -113,7 +115,6 @@ public class Lexer {
         Pattern grammer = Pattern.compile(totalGrammer);
 
         // Determine token and Build in order [Keyword -> id -> symbol -> digit -> char]
-        System.out.println("Running...");
         int lineNumber; // line being read
         String lastMatch = ""; // last match to be used to check for final EOP
 
@@ -124,7 +125,8 @@ public class Lexer {
 
             // Determine program # and display to user
             if(this.foundNew) {
-                System.out.println("PROCESSING PROGRAM # " + (myTotalTokens.size() + 1));
+                System.out.println("RUNNING LEXICAL ANALYSIS ON PROGRAM # " + (myTotalTokens.size() + 1));
+                this.myProgramNumber = myTotalTokens.size() + 1;
                 this.foundNew = false;
             }
 
@@ -167,9 +169,9 @@ public class Lexer {
                     }
 
                     // create token
-                    Token newKeywordToken = new Token(tokenID, myMatch, lineNumber);
+                    Token newKeywordToken = new Token(tokenID, myMatch, lineNumber + 1);
                     myTokens.add(newKeywordToken);
-                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber + 1) + "...");
+                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber) + "...");
                 }
 
                 // The Match is an ID
@@ -177,9 +179,9 @@ public class Lexer {
                     tokenID = "T_ID";
 
                     // create token
-                    Token newIDToken = new Token(tokenID, myMatch, lineNumber);
+                    Token newIDToken = new Token(tokenID, myMatch, lineNumber + 1);
                     myTokens.add(newIDToken);
-                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber + 1) + "...");
+                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber) + "...");
                 }
 
                 // The Match is a SYMBOL
@@ -202,9 +204,9 @@ public class Lexer {
                                 this.warningCount++;
                             } else {
                                 // Create Token if the $ does not exist in a comment or quote
-                                Token newSymbolToken = new Token(tokenID, myMatch, lineNumber);
+                                Token newSymbolToken = new Token(tokenID, myMatch, lineNumber + 1);
                                 myTokens.add(newSymbolToken);
-                                System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber +1) + "...");
+                                System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber) + "...");
                             }
                             continue; // proceed to next line
                         case "{":
@@ -239,9 +241,9 @@ public class Lexer {
                             System.out.println("WARNING UNAUTHORIZED CHARACTER [ " + myMatch + " ] in quotes - at line " + (lineNumber + 1) + "...");
                             this.warningCount++;
                         } else {
-                            Token newSymbolToken = new Token(tokenID, myMatch, lineNumber);
+                            Token newSymbolToken = new Token(tokenID, myMatch, lineNumber + 1);
                             myTokens.add(newSymbolToken);
-                            System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber +1) + "...");
+                            System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber) + "...");
                         }
                     }
                 }
@@ -257,9 +259,9 @@ public class Lexer {
                     // if the digit is not in quotes add normally
                     } else {
                         // Create Token for digit
-                        Token newDigitToken = new Token(tokenID, myMatch, lineNumber);
+                        Token newDigitToken = new Token(tokenID, myMatch, lineNumber + 1);
                         myTokens.add(newDigitToken);
-                        System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber + 1) + "...");
+                        System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber) + "...");
                     }
                 }
 
@@ -269,18 +271,18 @@ public class Lexer {
                     tokenID = "T_CHAR";
                     
                     // create token
-                    Token newCharToken = new Token(tokenID, myMatch, lineNumber);
+                    Token newCharToken = new Token(tokenID, myMatch, lineNumber + 1);
                     myTokens.add(newCharToken);
-                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber + 1) + "...");
+                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber) + "...");
                 }
 
                 // The Match is a WHITESPACE
                 else if(match.group().matches(whiteSpace) && inQuotes && !inComment) {
                     // only create a token for a whitespace that exists in quotes
                     tokenID = "T_SPACE";
-                    Token newCharToken = new Token(tokenID, myMatch, lineNumber);
+                    Token newCharToken = new Token(tokenID, myMatch, lineNumber + 1);
                     myTokens.add(newCharToken);
-                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber + 1) + "...");
+                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber) + "...");
                 }
 
                 // The Match is a QUOTE
@@ -291,9 +293,9 @@ public class Lexer {
                     inQuotes = !inQuotes;
 
                     // create token
-                    Token newQuoteToken = new Token(tokenID, myMatch, lineNumber);
+                    Token newQuoteToken = new Token(tokenID, myMatch, lineNumber + 1);
                     myTokens.add(newQuoteToken);
-                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber + 1) + "...");
+                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber) + "...");
                 }
                 
                 // The Match is a COMMENT
@@ -343,10 +345,13 @@ public class Lexer {
                 System.out.println("PARSER WILL NOT START DUE TO LEX ERRORS \n");
             } else {
                 System.out.println("Lexical Anaylsis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
-                System.out.println("PARSER STARTING... \n");
+                System.out.println("RUNNING PARSE ON PROGRAM  # " + this.myProgramNumber + "\n");
 
                 // Send tokens to PARSER
                 myParser.tokenStream(myTokens);
+
+                // Update Parser Program Number
+                myParser.setProgramNumber(this.myProgramNumber);
                 
                 // Start Parsing
                 myParser.parseProgram();
@@ -382,11 +387,14 @@ public class Lexer {
             System.out.println("Lexical Analysis Failed - Reached End of Program with "+ this.warningCount + " Warning(s) and " + this.errorCount + " Error(s) \n");
             System.out.println("PARSER WILL NOT START DUE THESE ERRORS \n");
         } else {
-            System.out.println("Lexical Anaylsis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
-            System.out.println("PARSER STARTING... \n");
+            System.out.println("Lexical Analysis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
+            System.out.println("PARSING PROGRAM # " + this.myProgramNumber + "... \n");
 
             // Send Tokens to PARSER
             myParser.tokenStream(myTokens);
+
+            // Update current Program Number
+            myParser.setProgramNumber(this.myProgramNumber);
 
             // Start parsing
             myParser.parseProgram();

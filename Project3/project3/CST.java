@@ -12,6 +12,7 @@ public class CST {
     // Private Instance Variables
     private Node myRoot; // the root node of the tree
     private Node myCurrent; // the current node we are on
+    private int myProgramNumber; // Current Program Number
 
     //! Begin CST Construction and Manipulation
 
@@ -19,12 +20,14 @@ public class CST {
     public CST() {
         this.myRoot = null;
         this.myCurrent = null;
+        this.myProgramNumber = 0;
     }
 
     // clear method for resetting tree
     public void clear() {
         this.myRoot = null;
         this.myCurrent = null;
+        this.myProgramNumber = 0;
     }
 
     //! End CST Construction and Manipulation
@@ -36,7 +39,33 @@ public class CST {
         return this.myRoot;
     }
 
-    // Method to add node to the correct place
+    // Setter method
+    public void setProgramNumber(int newProgramNumber) {
+        this.myProgramNumber = newProgramNumber;
+    }
+
+    // Method to add node to the correct place -> Line Correspondance
+    public void addNode(String treeType, String newType, int newLine) {
+        // Create a new node with the type
+        Node newNode = new Node(newType, treeType, newLine);
+
+        // Check if the tree is empty
+        if(this.myRoot == null) {
+            this.myRoot = newNode;
+            newNode.setParent(null);
+        } else {
+            // Else we set the parent to be our current
+            newNode.setParent(this.myCurrent);
+            newNode.getParent().addChild(newNode);
+        }
+
+        // If were not a leaf ie root/branch - we set the current to our new node
+        if(treeType.equalsIgnoreCase("leaf") == false) {
+            this.myCurrent = newNode;
+        }
+    }
+
+    // Method to add node to the correct place -> No Line Correspondance
     public void addNode(String treeType, String newType) {
         // Create a new node with the type
         Node newNode = new Node(newType, treeType);

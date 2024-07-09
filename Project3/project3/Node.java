@@ -14,6 +14,7 @@ public class Node {
     private String myTreeType; // to indicate type of tree structure
     private Node myParent; // parent node
     private ArrayList<Node> myChildren; // list of child nodes
+    private int myLine;
 
     //! Start Node Construction
     
@@ -23,22 +24,43 @@ public class Node {
         this.myTreeType = "";
         this.myParent = null;
         this.myChildren = new ArrayList<Node>();
+        this.myLine = -1;
     }
 
     // Semi Constructor
     public Node(String newType, String newTreeType) {
-        myType = newType;
-        myTreeType = newTreeType;
-        myParent = null;
-        myChildren = new ArrayList<Node>();
+        this.myType = newType;
+        this.myTreeType = newTreeType;
+        this.myParent = null;
+        this.myChildren = new ArrayList<Node>();
+        this.myLine = -1;
+    }
+
+    // Semi Constructor
+    public Node(String newType, String newTreeType, int newLine) {
+        this.myType = newType;
+        this.myTreeType = newTreeType;
+        this.myParent = null;
+        this.myChildren = new ArrayList<Node>();
+        this.myLine = newLine;
+    }
+
+    // Semi Constructor
+    public Node(String newType, String newTreeType, Node newParent) {
+        this.myType = newType;
+        this.myTreeType = newTreeType;
+        this.myParent = newParent;
+        this.myChildren = new ArrayList<Node>();
+        this.myLine = -1;
     }
 
     // Full Constructor
-    public Node(String newType, String newTreeType, Node newParent) {
-        myType = newType;
-        myTreeType = newTreeType;
-        myParent = newParent;
-        myChildren = new ArrayList<Node>();
+    public Node(String newType, String newTreeType, Node newParent, int newLine) {
+        this.myType = newType;
+        this.myTreeType = newTreeType;
+        this.myParent = newParent;
+        this.myChildren = new ArrayList<Node>();
+        this.myLine = newLine;
     }
 
     //! End Node Construction
@@ -69,6 +91,10 @@ public class Node {
 
     public ArrayList<Node> getChildren() {
         return this.myChildren;
+    }
+
+    public int getLine() {
+        return this.myLine;
     }
 
     // Method for adding children

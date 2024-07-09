@@ -30,5 +30,8 @@ public class Compiler {
             // Throw error if couldnt read file properly
             System.out.println("File Failed to be Read - Lexical Anaylsis will not proceed.");
         }
+
+        // Close Scanner Object
+        input.close();
     }
 }

@@ -18,12 +18,14 @@ Errors -> undeclared identifiers, redeclared identifiers in same scope, type mis
 
 Warnings -> variables declarded/declared and initialized but unused, used variables without initialization
 
+
+
 --TODO--
 
 Continue Work for Semantics
-1. display print hashtable
-2. Do Warnings implementation 
+1. display print hashtable -> Done -> test a little
+2. Do Warnings implementation -> Doing now -> 
+    Update isInit when Initialized
+    Check and throw Warning when variable is used without initialization
 3. Work on conclusions of semantic
-
--> need use hashTable id|type,isInit,isUsed
--> need scope tree (enhanced symbol table)
+4. Next Steps CONTINUE OR NO?? ERRORS?

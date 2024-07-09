@@ -3,14 +3,20 @@
     a = true
     int b
     a = b
+    int c
     {
         string a
         a = "a"
+        string d
         print(a)
     }
     string b
     b = "abc"
     if (a == 1) {
+        {
+            string l
+        }
+        string g
         print(b)
     }
 }

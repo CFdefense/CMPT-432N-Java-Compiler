@@ -24,6 +24,7 @@ public class Parser {
     private boolean foundEnd; // flag to mark if EOP is found to trigger parseResults()
     private AST myAST; // AST Instance to create AST from CST
     private Semantic mySemantic; // Semantic Instance to run Semantic Analysis
+    private int myProgramNumber;
 
     //! Begin Parser Construction and Manipulation
 
@@ -46,6 +47,7 @@ public class Parser {
         this.foundEnd = false;
         this.myAST = new AST();
         this.mySemantic = new Semantic();
+        this.myProgramNumber = 0;
     }
 
     // Method to read in tokens to parser
@@ -54,7 +56,6 @@ public class Parser {
         for(Token currToken : lexerTokens) {
             this.myTokens.add(currToken);
         }
-        System.out.println("LEXER TOKENS CACHED IN PARSER...");
     }
 
     // Method to reset parser in between program uses
@@ -69,6 +70,7 @@ public class Parser {
             this.myAST.clear();
         }
         this.mySemantic.clear();
+        this.myProgramNumber = 0;
     }
 
     // Method to get next token from stream -> increment instructionCount
@@ -79,34 +81,40 @@ public class Parser {
         }
     }
 
+    // Update program number
+    public void setProgramNumber(int newProgramNumber) {
+        this.myProgramNumber = newProgramNumber;
+    }
+
     // Method to determine the results of the parse
     public void parseResults() {
         // foundEnd -> if EOP is found
         // errorcount 
         if(this.foundEnd == true && this.errorCount == 0) {
-            System.out.println("PARSE SUCCESSFULLY COMPLETED WITH " + errorCount + " Error(s)");
+            System.out.println("PARSE SUCCESSFULLY COMPLETED WITH " + errorCount + " Error(s) \n");
             
-            System.out.println("DISPLAYING CONCRETE SYNTAX TREE...");
+            System.out.println("DISPLAYING CONCRETE SYNTAX TREE FOR PROGRAM # " + this.myProgramNumber + "...");
             myTree.displayCST(myTree.getRoot(), 0);
 
             // load and create AST
-            System.out.println("CREATING ABSTRACT SYNTAX TREE...");
             myAST.loadAST(myTree);
 
+            // update AST Program Number
+            myAST.setProgramNumber(this.myProgramNumber);
+
+            // Display AST
+            System.out.println("DISPLAYING ABSTRACT SYNTAX TREE FOR PROGRAM # " + this.myProgramNumber + "...");
+            myAST.displayAST(myAST.getRoot(), 0);
+
             // load and start semantic analysis
-            System.out.println("LOADING AST INTO SEMANTIC...");
-            this.mySemantic.loadAST(myAST);
-
-            // Print Symbol Table
-            this.mySemantic.displaySymbolTable();
-
+            this.mySemantic.startSemantic(myAST, this.myProgramNumber);
 
         } else if(this.foundEnd != true) {
-            System.out.println("PARSE FAILED FAILED WITH " + errorCount + " Error(s) EOP NOT FOUND");
+            System.out.println("PARSE FAILED FAILED WITH " + errorCount + " Error(s) EOP NOT FOUND \n");
             System.out.println("CST WILL NOT BE PRINTED");
             // Say how next part will not start
         } else if(this.errorCount > 0) {
-            System.out.println("PARSE FAILED WITH " + this.errorCount + " Error(s)");
+            System.out.println("PARSE FAILED WITH " + this.errorCount + " Error(s) \n");
             System.out.println("CST WILL NOT BE PRINTED");
             // Say how next part will not start
         }
@@ -123,11 +131,11 @@ public class Parser {
         if(this.currentToken.getLexeme().equals("$")) {
             // Create Node and update next
             this.foundEnd = true; // indicate we found the end -> parseResults()
-            this.myTree.addNode("leaf", currentToken.getLexeme());
+            this.myTree.addNode("leaf", currentToken.getLexeme(), currentToken.getLine());
             nextToken();
         } else if(this.currentToken.getLexeme().equalsIgnoreCase(expectedValue)) {
             // If Current Lexeme matches we make Node and update next
-            this.myTree.addNode("leaf", this.currentToken.getLexeme());
+            this.myTree.addNode("leaf", this.currentToken.getLexeme(), currentToken.getLine());
             nextToken();
         } else {
             // if the current token does not match expected throw an error
@@ -188,7 +196,7 @@ public class Parser {
 
         // if we successfully match we will create the leaf
         if(switchResult) {
-            this.myTree.addNode("leaf", this.currentToken.getLexeme());
+            this.myTree.addNode("leaf", this.currentToken.getLexeme(), this.currentToken.getLine());
         } else {
             // throw error for unmatched expected lexeme
             System.out.println("ERROR NO MATCH FOUND!!! Input -> " + this.currentToken.getLexeme() + " Does not match any expected: " + expected);
@@ -206,7 +214,7 @@ public class Parser {
 
     // Program ::== Block $ 
     public void parseProgram() {
-        System.out.println("->Parsing Program<-");
+        System.out.println("->Parsing Program # " + this.myProgramNumber + "<-");
         
         // get first token
         this.nextToken();

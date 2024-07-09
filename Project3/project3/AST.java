@@ -16,11 +16,13 @@ public class AST {
     private CST myCST; // the CST we are turning into AST
     private String[] gramChar; // to store acceptable chars
     private int[] gramDigit; // to store acceptable digits
+    private int myProgramNumber; // Current Program Number
 
     //! Begin AST Construction and Manipulation
 
     // Null Constructor
     public AST() {
+        this.myProgramNumber = 0;
         this.myASTRoot = null; // to keep track of AST root
         this.myCurrAST = null; // to keep track of current AST node
         this.myCurrCST = null; // to keep track of CST curr node being traversed
@@ -40,6 +42,11 @@ public class AST {
         this.myCST = null;
     }
 
+    // Setter method
+    public void setProgramNumber(int newProgramNumber) {
+        this.myProgramNumber = newProgramNumber;
+    }
+
     // Method to load in CST and create AST 
     public void loadAST(CST newCST) {
         // Load CST and update curent and root
@@ -48,10 +55,7 @@ public class AST {
         // Call creation of AST
         createAST(myCST.getRoot());
         System.out.println("AST Created...");
-
-        // Display the AST
-        System.out.println("DISPLAYING AST...");
-        displayAST(myASTRoot, 0);
+        
     }
 
     // Method for converting the CST into the AST 'Just the good stuff' 
@@ -118,7 +122,7 @@ public class AST {
                 // create the node to be added
                 Node newNode;
                 if(nodeType.equalsIgnoreCase("int") || nodeType.equalsIgnoreCase("string") || nodeType.equalsIgnoreCase("boolean")) {
-                    newNode = new Node(nodeType,"Leaf", myCurrAST); 
+                    newNode = new Node(nodeType,"Leaf", myCurrAST, currCSTNode.getLine()); 
                 } else {
                     newNode = new Node(nodeType,"Branch", myCurrAST);
                 }
@@ -162,7 +166,7 @@ public class AST {
                 addChar = "\"" + addChar + "\"";
 
                 // Create the node
-                Node newChar = new Node(addChar, "leaf", this.myCurrAST);
+                Node newChar = new Node(addChar, "leaf", this.myCurrAST, currCSTNode.getLine());
 
                 // Add to parent node
                 this.myCurrAST.addChild(newChar);
@@ -228,7 +232,7 @@ public class AST {
                     // Check if bool value
                     if(nodeType.equalsIgnoreCase("true") || nodeType.equalsIgnoreCase("false")) {
                         // create new leaf node
-                        Node newFound = new Node(nodeType, "leaf", myCurrAST);
+                        Node newFound = new Node(nodeType, "leaf", myCurrAST, currCSTNode.getLine());
 
                         // add leaf node to AST
                         this.myCurrAST.addChild(newFound);
@@ -238,7 +242,7 @@ public class AST {
                     // if we have identified the type to be of a char or digit
                     if(foundDigChar) {
                         // create new leaf node
-                        Node newFound = new Node(nodeType, "leaf", myCurrAST);
+                        Node newFound = new Node(nodeType, "leaf", myCurrAST, currCSTNode.getLine());
 
                         // add leaf node to AST
                         this.myCurrAST.addChild(newFound);

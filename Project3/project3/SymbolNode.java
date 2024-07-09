@@ -63,8 +63,8 @@ public class SymbolNode {
     }
 
     // Method to add create and add symbol
-    public void addSymbol(String newType, String newKey) {
-        mySymbols.put(newKey, new Symbol(newType));
+    public void addSymbol(String newType, String newKey, int newLine) {
+        mySymbols.put(newKey, new Symbol(newType, newLine, this.myScope));
     }
 
     // Method to see if ID has been declared

@@ -5,7 +5,9 @@
 */
 package project3;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 public class SymbolTable {
@@ -13,11 +15,13 @@ public class SymbolTable {
     // Private Instance Varuables
     private SymbolNode myRoot; // Root Node for Tree
     private SymbolNode myCurrent; // Current Node for Tree
+    private int myProgramNumber;
 
     // Null Constructor
     public SymbolTable() {
         this.myRoot = null;
         this.myCurrent = null;
+        this.myProgramNumber = 0;
     }
 
     // clear method for resetting tree
@@ -29,6 +33,11 @@ public class SymbolTable {
     // Getter method
     public SymbolNode getRoot() {
         return this.myRoot;
+    }
+
+    // Setter method
+    public void setProgramNumber(int newProgramNumber) {
+        this.myProgramNumber = newProgramNumber;
     }
 
     // Method to add node to the correct place
@@ -47,11 +56,12 @@ public class SymbolTable {
     }
 
     // Method to create a new symbol
-    public void createSymbol(String newType, String newKey) {
+    public void createSymbol(String newType, String newKey, int newLine) {
 
         // Call current scopes add method
-        this.myCurrent.addSymbol(newType, newKey);
+        this.myCurrent.addSymbol(newType, newKey, newLine);
     }
+
 
     // Method to identify if a var has been declared
     public Symbol search(String findID) {
@@ -82,25 +92,37 @@ public class SymbolTable {
     // Recursive Method to display tree
     public void displayTree(SymbolNode displayCurrent) {
 
+        // If at root display table header
+        if(displayCurrent == this.myRoot) {
+            System.out.println("--------------------------------------");
+            System.out.println("    Name     Type     Scope    Line   ");
+            System.out.println("--------------------------------------");
+        }
+
         // Base Case
         if(displayCurrent == null) {
             return;
         } else {
             // Recursive Case
-            
-            // Output Scope
-            System.out.println("--- Scope " + displayCurrent.getScope() + " ---");
 
             // Get current SymbolNode's HashTable
             Hashtable<String, Symbol> currentHash = displayCurrent.getSymbols();
+            
+            // Collect entries into a list
+            List<Map.Entry<String, Symbol>> symbolList = new ArrayList<>(currentHash.entrySet());
+
+            // Lambda function to Sort the list based on Symbol.getLine()
+            symbolList.sort((entry1, entry2) -> Integer.compare(entry1.getValue().getLine(), entry2.getValue().getLine()));
 
             // Iterate over Hashtable instances
-            for(Map.Entry<String, Symbol> current : currentHash.entrySet()) {
+            for(Map.Entry<String, Symbol> current : symbolList) {
                 String currVar = current.getKey();
                 Symbol currSymbol = current.getValue();
+                int currScope = currSymbol.getScope();
+                int currLine = currSymbol.getLine();
 
                 // Print all Symbol Info
-                System.out.println("- " + currVar + " | " + currSymbol.getType() + ", " + currSymbol.getInit() + ", " + currSymbol.getUsed());
+                System.out.println("     " + currVar + "       " + currSymbol.getType() + "\t" + currScope + "\t" + currLine);
             
             }
 
@@ -110,5 +132,42 @@ public class SymbolTable {
             }
             
         }
+    }
+
+    // Method to Determine Unused Variables Following Semantic Analysis
+    public int checkUsed(SymbolNode currentSymNode, int warningCount) {
+        // Base Case
+        if(currentSymNode == null) {
+            return warningCount;
+        } else {
+            // Recursive Case
+
+            // Get current SymbolNode's HashTable
+            Hashtable<String, Symbol> currentHash = currentSymNode.getSymbols();
+
+            // Iterate over Hashtable instances
+            for (Map.Entry<String, Symbol> current : currentHash.entrySet()) {
+            String currVar = current.getKey();
+            Symbol currSymbol = current.getValue();
+            int currScope = currSymbol.getScope();
+            int currLine = currSymbol.getLine();
+
+            // Check if the variable is not used and not init
+            if (!currSymbol.getUsed() && !currSymbol.getInit()) {
+                warningCount++;
+                System.out.println("WARNING: VARIABLE " + currVar + " UNINITIALIZED AND UNUSED | Declared on line " + currLine + ", in scope " + currScope);
+            } else if(!currSymbol.getUsed()) {
+                warningCount++;
+                System.out.println("WARNING: VARIABLE " + currVar + " UNUSED | Declared on line " + currLine + ", in scope " + currScope);
+            }
+            }
+
+            // Recursively Call on Children
+            for(SymbolNode child : currentSymNode.getChildren()) {
+                warningCount = checkUsed(child, warningCount);
+            }
+        }
+
+        return warningCount;
     }
 }

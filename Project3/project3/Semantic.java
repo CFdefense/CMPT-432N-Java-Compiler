@@ -19,6 +19,7 @@ public class Semantic {
     private int warningCount; // Count for # of Warnings
     private SymbolTable mySymbolTable; // Instance of Symbol Table
     private int[] gramDigit; // Acceptable digit values
+    private int myProgramNumber; // Current program 
 
     // Null Constructor
     public Semantic() {
@@ -29,17 +30,26 @@ public class Semantic {
         this.previousNode = null;
         this.mySymbolTable = new SymbolTable();
         this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        this.myProgramNumber = 0;
     }
 
     // Method to load in AST and begin Semantic Anaylsis
-    public void loadAST(AST newAST) {
+    public void startSemantic(AST newAST, int newProgramNumber) {
         // Load in AST
         this.myAST = newAST;
-        System.out.println("AST LOADED INTO SEMANTIC...");
+
+        // Update Program Number
+        setProgramNumber(newProgramNumber);
 
         // Begin Semantic Anaylsis
-        System.out.println("STARTING SEMANTIC ANALYSIS...");
+        System.out.println("STARTING SEMANTIC ANALYSIS ...");
         SemanticAnalysis(this.myAST.getRoot(), 0);
+
+        // Update Warning Count With Unused Vars
+        checkForUsed();
+
+        // Display Results and Determine If We Continue
+
     }
 
     // Semantic Analysis Method to Traverse AST and Preform Semantic Analysis
@@ -91,7 +101,7 @@ public class Semantic {
                 
                 if(isDec == null) {
                     // Create symbol as first child is type and second is ID
-                    this.mySymbolTable.createSymbol(currVarDecl.get(0).getType(), currVarDecl.get(1).getType());
+                    this.mySymbolTable.createSymbol(currVarDecl.get(0).getType(), currVarDecl.get(1).getType(), currVarDecl.get(1).getLine());
                 } else {
                     // Throw error
                     System.out.println("ERROR VARIABLE REDECLARED - [ " + currVarDecl.get(1).getType() + " ]");
@@ -114,6 +124,9 @@ public class Semantic {
 
                 // Boolean for result
                 boolean overallResult = true;
+
+                // Boolean for isDeclared
+                boolean isDeclared = true;
 
                 // It has been declared
                 if(findings != null) {
@@ -196,7 +209,14 @@ public class Semantic {
                     // It has not been declared throw error
                     System.out.println("ERROR UNDECLARED VARIABLE [ " + currAssign.get(0).getType() + " ]");
                     this.errorCount++;
+                    isDeclared = false;
                 }
+                
+                // If the Symbol is declared and all types match we set it as initialized
+                if(isDeclared && overallResult) {
+                    findings.setInit(true);
+                }
+
                 break;
             case "While Statement":
             case "IF Statement":
@@ -330,6 +350,11 @@ public class Semantic {
         this.warningCount = 0;
         this.currentNode = null;
         this.mySymbolTable.clear();
+        this.myProgramNumber = 0;
+    }
+
+    public void setProgramNumber(int newProgramNumber) {
+        this.myProgramNumber = newProgramNumber;
     }
 
     // Method to determine the type of a leaf node
@@ -396,6 +421,24 @@ public class Semantic {
     public void displaySymbolTable() {
         System.out.println("Displaying Symbol Table...");
         this.mySymbolTable.displayTree(this.mySymbolTable.getRoot());
+    }
+    
+    // Method to give ErrorCount to Parser For Analysis
+    public int getErrorCount() {
+        return this.errorCount;
+    }
+    // Method to give Warning Count to Parser For Analysis
+    public int getWarningCount() {
+        return this.warningCount;
+    }
+
+    // Method to Determine Unused Variables Following Semantic Analysis
+    public void checkForUsed() {
+        // Call The Symbol Table's Method
+        int warningUpdate = this.mySymbolTable.checkUsed(this.mySymbolTable.getRoot(), 0);
+
+        // Update Semantic Running Warning Count
+        this.warningCount += warningUpdate;
     }
     
 }

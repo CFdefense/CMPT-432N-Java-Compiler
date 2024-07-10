@@ -3,7 +3,7 @@
     -> to hold varName, varType, isInit, isUsed, Scope, Line #
 */
 
-package Project4;
+package project4;
 
 public class Symbol {
 

@@ -3,7 +3,7 @@
     Tokens hold a type, lexeme and the line in which they were read from.
 */
 
-package Project4;
+package project4;
 
 public class Token {
     

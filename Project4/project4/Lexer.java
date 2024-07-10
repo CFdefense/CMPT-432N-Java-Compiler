@@ -4,7 +4,7 @@
     Perform lexical analysis on input programs and return an ordered stream of tokens
 */
 
-package Project4;
+package project4;
 
 import java.io.File;
 import java.util.ArrayList;

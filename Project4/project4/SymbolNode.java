@@ -6,7 +6,7 @@
     ->HashTable of Symbols -> per request of slides
 */
 
-package Project4;
+package project4;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

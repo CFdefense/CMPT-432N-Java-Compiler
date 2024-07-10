@@ -5,7 +5,7 @@
 
 */
 
-package Project4;
+package project4;
 
 public class CST {
 

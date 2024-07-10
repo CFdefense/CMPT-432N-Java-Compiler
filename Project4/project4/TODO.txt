@@ -1,0 +1,29 @@
+Project 3 - AST and Semantic Analysis
+
+--LEX AND PARSE MUST BE SUCCESSFULL--
+
+1. Create and Display AST from CST or tokens --- DONE
+
+2. Semantic Analysis -> Scope Checks and Type Checks the AST
+
+3. Create and Display Symbol Table with type and Scope Information
+
+Important::
+While Scope-Checking 
+    -> build symbol table of Symbols which includes [Name, datatype, scope, position, etc]
+
+Type check source code using AST and symbol table
+
+Errors -> undeclared identifiers, redeclared identifiers in same scope, type mismatch, etc.
+
+Warnings -> variables declarded/declared and initialized but unused, used variables without initialization
+
+
+
+--TODO--
+
+Continue Work for Semantics
+1. display print hashtable -> Done -> test a little
+2. Do Warnings implementation -> Done
+3. Work on conclusions of semantic -> Done
+4. Next Steps CONTINUE OR NO?? ERRORS? -> Done

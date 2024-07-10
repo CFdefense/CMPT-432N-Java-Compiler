@@ -3,7 +3,7 @@
     -> Create Class Methods and Tree Structure
 
 */
-package Project4;
+package project4;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

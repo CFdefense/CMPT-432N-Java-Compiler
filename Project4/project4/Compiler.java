@@ -1,6 +1,6 @@
 // Main File for Testing and Implementation of Compiler
 
-package Project4;
+package project4;
 
 import java.util.Scanner;
 

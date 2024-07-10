@@ -1,29 +1,29 @@
-Project 3 - AST and Semantic Analysis
+Project 4 -- 6502 Machine Code Generation
 
---LEX AND PARSE MUST BE SUCCESSFULL--
+Overall Objective -- AST -> Assembly -> Opcodes
 
-1. Create and Display AST from CST or tokens --- DONE
+GenerateMachineCode
+-> Byte Array Size 256 bytes
+-> Accumulator
+-> Register x
+-> Register y
+--> Instructions
+-> Translate to Assembly
+-> Translate to Opcodes
+-> BackPatch
+-> Fill Remaining Space
 
-2. Semantic Analysis -> Scope Checks and Type Checks the AST
+TableForTemps
+-> Temporary Static Location 
+-> Var Name
+-> Address
+--> Instructions
+-> Address Lookup Given Var
 
-3. Create and Display Symbol Table with type and Scope Information
+TableForJumps
+-> Jump Hex
+-> Jump Distance
 
-Important::
-While Scope-Checking 
-    -> build symbol table of Symbols which includes [Name, datatype, scope, position, etc]
-
-Type check source code using AST and symbol table
-
-Errors -> undeclared identifiers, redeclared identifiers in same scope, type mismatch, etc.
-
-Warnings -> variables declarded/declared and initialized but unused, used variables without initialization
-
-
-
---TODO--
-
-Continue Work for Semantics
-1. display print hashtable -> Done -> test a little
-2. Do Warnings implementation -> Done
-3. Work on conclusions of semantic -> Done
-4. Next Steps CONTINUE OR NO?? ERRORS? -> Done
+--> Read Code Stored from Top -> Down
+--> After Code is Stack
+--> Heap Stored Down -> Up

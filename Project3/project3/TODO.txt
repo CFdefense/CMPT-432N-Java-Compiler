@@ -24,8 +24,6 @@ Warnings -> variables declarded/declared and initialized but unused, used variab
 
 Continue Work for Semantics
 1. display print hashtable -> Done -> test a little
-2. Do Warnings implementation -> Doing now -> 
-    Update isInit when Initialized
-    Check and throw Warning when variable is used without initialization
-3. Work on conclusions of semantic
-4. Next Steps CONTINUE OR NO?? ERRORS?
+2. Do Warnings implementation -> Done
+3. Work on conclusions of semantic -> Done
+4. Next Steps CONTINUE OR NO?? ERRORS? -> Done

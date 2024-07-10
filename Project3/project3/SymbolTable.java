@@ -35,6 +35,11 @@ public class SymbolTable {
         return this.myRoot;
     }
 
+    // Unused but gets rid of VScode errors
+    public int getProgramNumber() {
+        return this.myProgramNumber;
+    }
+
     // Setter method
     public void setProgramNumber(int newProgramNumber) {
         this.myProgramNumber = newProgramNumber;

@@ -42,9 +42,14 @@ public class AST {
         this.myCST = null;
     }
 
-    // Setter method
+    // Setter Method
     public void setProgramNumber(int newProgramNumber) {
         this.myProgramNumber = newProgramNumber;
+    }
+
+    // Getter Method -> Unused but gets rid of VScode errors
+    public int getProgramNumber() {
+        return this.myProgramNumber;
     }
 
     // Method to load in CST and create AST 
@@ -53,9 +58,7 @@ public class AST {
         this.myCST = newCST;
 
         // Call creation of AST
-        createAST(myCST.getRoot());
-        System.out.println("AST Created...");
-        
+        createAST(myCST.getRoot());   
     }
 
     // Method for converting the CST into the AST 'Just the good stuff' 
@@ -69,7 +72,6 @@ public class AST {
         switch(nodeType) {
             case "Program":
                 // Create new node
-                System.out.println("Creating Program AST");
                 Node newASTNode = new Node("Program", "root");
 
                 // Set AST root as this new node
@@ -332,8 +334,10 @@ public class AST {
         if(currNode.getChildren().size() == 0) {
             System.out.println("[" + currNode.getType() + "]");
         } else {
-            // print type
-            System.out.println("<" + currNode.getType() + ">");
+            // print type -> Dont print program but need for a root
+            if(!currNode.getType().equalsIgnoreCase("Program")) {
+                System.out.println("<" + currNode.getType() + ">");
+            }
             
             // Recursively call the method on the children of the curr node
             for(Node child : currNode.getChildren()) {

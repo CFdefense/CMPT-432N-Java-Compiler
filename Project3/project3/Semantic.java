@@ -33,7 +33,7 @@ public class Semantic {
         this.myProgramNumber = 0;
     }
 
-    // Method to load in AST and begin Semantic Anaylsis
+    // Method For Overall Semantic Analysis Control
     public void startSemantic(AST newAST, int newProgramNumber) {
         // Load in AST
         this.myAST = newAST;
@@ -42,13 +42,25 @@ public class Semantic {
         setProgramNumber(newProgramNumber);
 
         // Begin Semantic Anaylsis
-        System.out.println("STARTING SEMANTIC ANALYSIS ...");
+        System.out.println("\nSTARTING SEMANTIC ANALYSIS ON PROGRAM # " + this.myProgramNumber +  "...\n");
         SemanticAnalysis(this.myAST.getRoot(), 0);
 
         // Update Warning Count With Unused Vars
         checkForUsed();
 
         // Display Results and Determine If We Continue
+        System.out.println("Program " + this.myProgramNumber + " Semantic Anaylsis produced " + this.errorCount + " error(s) and " + this.warningCount + " warning(s) \n");
+
+        // Determine How We Proceed
+        if(this.errorCount > 0) {
+            System.out.println("Program " + this.myProgramNumber + " Symbol Table not displayed due to detected Semantic Analysis Error(s)");
+        } else {
+            // Display Table
+            displaySymbolTable();
+
+            // Code Generation Call Here
+
+        }
 
     }
 
@@ -62,14 +74,12 @@ public class Semantic {
         // Determine What Type
         switch(currentType) {
             case "Program":
-                System.out.println("Found Program");
                 // IF program continue down
                 for(Node child : currNode.getChildren()) {
                     SemanticAnalysis(child, currScope);
                 }
                 break;
             case "Block":
-                System.out.println("Found Block");
                 // IF new Block, create and add to our Symbol Table
                 SymbolNode newSymbolNode = new SymbolNode(currScope);
                 this.mySymbolTable.addNode(newSymbolNode);
@@ -92,7 +102,6 @@ public class Semantic {
                 
                 break;
             case "VarDecl":
-                System.out.println("Found VarDecl");
                 // Get the children of VarDecl
                 ArrayList<Node> currVarDecl = currNode.getChildren();
 
@@ -104,13 +113,12 @@ public class Semantic {
                     this.mySymbolTable.createSymbol(currVarDecl.get(0).getType(), currVarDecl.get(1).getType(), currVarDecl.get(1).getLine());
                 } else {
                     // Throw error
-                    System.out.println("ERROR VARIABLE REDECLARED - [ " + currVarDecl.get(1).getType() + " ]");
+                    System.out.println("ERROR: VARIABLE REDECLARED - [ " + currVarDecl.get(1).getType() + " ]");
                     this.errorCount++;
                 }
 
                 break;
             case "Assignment":
-                System.out.println("Found Assignment");
                 // Check for declaration and type check
 
                 // Get the children of assign
@@ -130,9 +138,9 @@ public class Semantic {
 
                 // It has been declared
                 if(findings != null) {
+                    findings.setUsed(true); // Mark the variable as used -> Dont need to error check
                     switch(findings.getType()) {
                         case "int":
-                            System.out.println("Looking for Int Assignment");
                             // Log all Neighboring Types (and declare check)
                             for(Node children : currAssign) {
                                 String currType = checkType(children);
@@ -156,7 +164,6 @@ public class Semantic {
 
                             break;
                         case "string":
-                            System.out.println("Looking for String Assignment");
                             // Log all Neighboring Types (and declare check)
                             for(Node children : currAssign) {
                                 String currType = checkType(children);
@@ -174,13 +181,12 @@ public class Semantic {
 
                             // If not all Strings throw error
                             if(!overallResult) {
-                                System.out.println("ERROR TYPE MISMATCH FOR String [ " + currAssign.get(0).getType() + " ]");
+                                System.out.println("ERROR: TYPE MISMATCH FOR String [ " + currAssign.get(0).getType() + " ]");
                                 this.errorCount++;
                             }
 
                             break;
                         case "boolean":
-                            System.out.println("Looking for Boolean Assignment");
                             // Log all Neighboring Types (and declare check)
                             for(Node children : currAssign) {
                                 String currType = checkType(children);
@@ -198,7 +204,7 @@ public class Semantic {
 
                             // If they are not all ints throw error
                             if(!overallResult) {
-                                System.out.println("ERROR TYPE MISMATCH FOR Boolean [ " + currAssign.get(0).getType() + " ]");
+                                System.out.println("ERROR: TYPE MISMATCH FOR Boolean [ " + currAssign.get(0).getType() + " ]");
                                 this.errorCount++;
                             }
 
@@ -207,7 +213,7 @@ public class Semantic {
 
                 } else {
                     // It has not been declared throw error
-                    System.out.println("ERROR UNDECLARED VARIABLE [ " + currAssign.get(0).getType() + " ]");
+                    System.out.println("ERROR: UNDECLARED VARIABLE [ " + currAssign.get(0).getType() + " ]");
                     this.errorCount++;
                     isDeclared = false;
                 }
@@ -220,7 +226,6 @@ public class Semantic {
                 break;
             case "While Statement":
             case "IF Statement":
-                System.out.println("Found If/While Statement");
                 // Go Down to isEq or isNEq
                 for(Node child : currNode.getChildren()) {
                     SemanticAnalysis(child, currScope);
@@ -229,9 +234,7 @@ public class Semantic {
             case "isEq":
                 // type check and declare check the children
             case "isNEq":
-                System.out.println("Found isEq/isNEq");
                 // Both isEq and isNEq children are expr so check if all on both sides are same type
-                
                 // Get the children of equals
                 ArrayList<Node> currEquals = currNode.getChildren();
                 ArrayList<String> leftTypes = new ArrayList<>(); // ArrayList to hold all types of left node
@@ -269,7 +272,7 @@ public class Semantic {
                         leftType = leftTypes.get(i);
                     } else {
                         if(!leftType.equalsIgnoreCase(leftTypes.get(i))) {
-                            System.out.println("ERROR TYPE MISMATCH - Expected [ " + leftType + " ] but found " + leftTypes.get(i));
+                            System.out.println("ERROR: TYPE MISMATCH - Expected [ " + leftType + " ] but found " + leftTypes.get(i));
                             leftSuccess = false;
                             this.errorCount++;
                             break;
@@ -283,7 +286,7 @@ public class Semantic {
                         rightType = rightTypes.get(i);
                     } else {
                         if(!rightType.equalsIgnoreCase(rightTypes.get(i))) {
-                            System.out.println("ERROR TYPE MISMATCH - Expected [ " + rightType + " ] but found " + rightTypes.get(i));
+                            System.out.println("ERROR: TYPE MISMATCH - Expected [ " + rightType + " ] but found " + rightTypes.get(i));
                             rightSuccess = false;
                             this.errorCount++;
                             break;
@@ -293,12 +296,11 @@ public class Semantic {
                 
                 // Check if Both Sides are Equal
                 if(!leftSuccess || !rightSuccess) {
-                    System.out.println("ERROR TYPE MISMATCH - [ " + leftType + " ] != [ " + rightType + " ]");
+                    System.out.println("ERROR: TYPE MISMATCH - [ " + leftType + " ] != [ " + rightType + " ]");
                     this.errorCount++;
                 }
                 break;
             case "Print":
-                System.out.println("Found Print Statement");
                 // type check and declare check the children
 
                 //Arraylist to hold types of assignment
@@ -337,7 +339,7 @@ public class Semantic {
 
                 // Display results
                 if(!printResult) {
-                    System.out.println("ERROR TYPE MISMTACH IN PRINT STATEMENT - Expected [ " + firstType + " ] but found [ " + resultstring + " ]");
+                    System.out.println("ERROR: TYPE MISMTACH IN PRINT STATEMENT - Expected [ " + firstType + " ] but found [ " + resultstring + " ]");
                     this.errorCount++;
                 }
         }       
@@ -345,7 +347,6 @@ public class Semantic {
 
     // Method to clear Semantic
     public void clear() {
-        System.out.println("Clearing Semantic Analyzer...");
         this.errorCount = 0;
         this.warningCount = 0;
         this.currentNode = null;
@@ -359,7 +360,6 @@ public class Semantic {
 
     // Method to determine the type of a leaf node
     public String checkType(Node leafNode) {
-        System.out.println("Checking Type: " + leafNode.getType());
         // Instance Variables
         String nodeType = "";
         String leafType = leafNode.getType();
@@ -397,6 +397,7 @@ public class Semantic {
         Symbol findings = this.mySymbolTable.search(leafType);
         
         if(findings != null) {
+            findings.setUsed(true); // Mark the variable as used no need to error check
             String findingsType = findings.getType();
             switch(findingsType) {
                 case "int":
@@ -411,7 +412,7 @@ public class Semantic {
             }
         } else if(!isNum && !isBool && !isStr) {
             // invalid id
-            System.out.println("ERROR UNDECLARED VARIABLE USED: [ " + leafNode.getType() + " ]");
+            System.out.println("ERROR: UNDECLARED VARIABLE USED: [ " + leafNode.getType() + " ]");
             this.errorCount++;
         }
         return nodeType;
@@ -419,17 +420,8 @@ public class Semantic {
 
     // Method to Display The Symbol Table
     public void displaySymbolTable() {
-        System.out.println("Displaying Symbol Table...");
+        System.out.println("Displaying Program # " + this.myProgramNumber + " Symbol Table...");
         this.mySymbolTable.displayTree(this.mySymbolTable.getRoot());
-    }
-    
-    // Method to give ErrorCount to Parser For Analysis
-    public int getErrorCount() {
-        return this.errorCount;
-    }
-    // Method to give Warning Count to Parser For Analysis
-    public int getWarningCount() {
-        return this.warningCount;
     }
 
     // Method to Determine Unused Variables Following Semantic Analysis

@@ -94,8 +94,6 @@ public class Lexer {
     //! Start Lexical Analysis (Scanner)
 
     public void lexicalAnalysis() {
-
-        System.out.println("COMPILER RUNNING... \n");
         
         // Define our Grammer to be used by regex pattern detection
         String ids = "[a-z]"; // regex a through z 
@@ -125,7 +123,7 @@ public class Lexer {
 
             // Determine program # and display to user
             if(this.foundNew) {
-                System.out.println("RUNNING LEXICAL ANALYSIS ON PROGRAM # " + (myTotalTokens.size() + 1));
+                System.out.println("\nRUNNING LEXICAL ANALYSIS ON PROGRAM # " + (myTotalTokens.size() + 1) + "\n");
                 this.myProgramNumber = myTotalTokens.size() + 1;
                 this.foundNew = false;
             }
@@ -341,10 +339,14 @@ public class Lexer {
         if(this.foundEnd) {
             // output final conclusion
             if(this.errorCount > 0) {
-                System.out.println("Lexical Analysis Failed - Reached End of Program with "+ this.warningCount + " Warning(s) and " + this.errorCount + " Error(s) \n");
-                System.out.println("PARSER WILL NOT START DUE TO LEX ERRORS \n");
+                System.out.println("Program " + this.myProgramNumber + " Lexical Analysis Failed - Reached End of Program with "+ this.warningCount + " Warning(s) and " + this.errorCount + " Error(s) \n");
+                System.out.println("PARSER WILL NOT START DUE TO LEXER ERRORS");
+                System.out.println("CST WILL NOT BE PRINTED");
+                System.out.println("AST WILL NOT BE CREATED");
+                System.out.println("SEMANTIC ANALYSIS WILL NOT START");
+                System.out.println("CODE GENERATION WILL NOT START \n");
             } else {
-                System.out.println("Lexical Anaylsis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
+                System.out.println("Program " + this.myProgramNumber + " Lexical Anaylsis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
                 System.out.println("RUNNING PARSE ON PROGRAM  # " + this.myProgramNumber + "\n");
 
                 // Send tokens to PARSER
@@ -384,10 +386,14 @@ public class Lexer {
 
         // output final conclusion
         if(this.errorCount > 0) {
-            System.out.println("Lexical Analysis Failed - Reached End of Program with "+ this.warningCount + " Warning(s) and " + this.errorCount + " Error(s) \n");
-            System.out.println("PARSER WILL NOT START DUE THESE ERRORS \n");
+            System.out.println("Program " + this.myProgramNumber + " Lexical Analysis Failed - Reached End of Program with "+ this.warningCount + " Warning(s) and " + this.errorCount + " Error(s) \n");
+            System.out.println("PARSER WILL NOT START DUE THESE ERRORS");
+            System.out.println("CST WILL NOT BE PRINTED");
+            System.out.println("AST WILL NOT BE CREATED");
+            System.out.println("SEMANTIC ANALYSIS WILL NOT START");
+            System.out.println("CODE GENERATION WILL NOT START \n");
         } else {
-            System.out.println("Lexical Analysis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
+            System.out.println("Program " + this.myProgramNumber + "Lexical Analysis Completed - Error Count: " + this.errorCount + " Warning Count: " + this.warningCount + "\n");
             System.out.println("PARSING PROGRAM # " + this.myProgramNumber + "... \n");
 
             // Send Tokens to PARSER

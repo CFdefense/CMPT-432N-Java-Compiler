@@ -25,6 +25,7 @@ public class Compiler {
 
         // Run Lexical Analysis on Interpretted results (if possible)
         if(fileRead) {
+            System.out.println("\nFile Successfully Read -> COMPILER STARTING...");
             myLexer.lexicalAnalysis();
         } else {
             // Throw error if couldnt read file properly

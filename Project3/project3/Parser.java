@@ -64,7 +64,6 @@ public class Parser {
         this.myTree.clear();
         this.instructionCount = 0;
         this.errorCount = 0;
-        System.out.println("PARSER CLEARED... \n");
         this.foundEnd = false;
         if(this.myAST.getRoot() != null) {
             this.myAST.clear();
@@ -91,9 +90,9 @@ public class Parser {
         // foundEnd -> if EOP is found
         // errorcount 
         if(this.foundEnd == true && this.errorCount == 0) {
-            System.out.println("PARSE SUCCESSFULLY COMPLETED WITH " + errorCount + " Error(s) \n");
+            System.out.println("Program " + this.myProgramNumber + " PARSE SUCCESSFULLY COMPLETED WITH " + errorCount + " Error(s) \n");
             
-            System.out.println("DISPLAYING CONCRETE SYNTAX TREE FOR PROGRAM # " + this.myProgramNumber + "...");
+            System.out.println("DISPLAYING CONCRETE SYNTAX TREE FOR PROGRAM # " + this.myProgramNumber + "...\n");
             myTree.displayCST(myTree.getRoot(), 0);
 
             // load and create AST
@@ -103,20 +102,27 @@ public class Parser {
             myAST.setProgramNumber(this.myProgramNumber);
 
             // Display AST
-            System.out.println("DISPLAYING ABSTRACT SYNTAX TREE FOR PROGRAM # " + this.myProgramNumber + "...");
+            System.out.println("\nDISPLAYING ABSTRACT SYNTAX TREE FOR PROGRAM # " + this.myProgramNumber + "... \n");
             myAST.displayAST(myAST.getRoot(), 0);
 
             // load and start semantic analysis
             this.mySemantic.startSemantic(myAST, this.myProgramNumber);
 
         } else if(this.foundEnd != true) {
+            // Throw error and Cease Compiling
             System.out.println("PARSE FAILED FAILED WITH " + errorCount + " Error(s) EOP NOT FOUND \n");
             System.out.println("CST WILL NOT BE PRINTED");
-            // Say how next part will not start
+            System.out.println("AST WILL NOT BE CREATED");
+            System.out.println("SEMANTIC ANALYSIS WILL NOT START");
+            System.out.println("CODE GENERATION WILL NOT START");
         } else if(this.errorCount > 0) {
+            // Throw error and Cease Compiling
             System.out.println("PARSE FAILED WITH " + this.errorCount + " Error(s) \n");
             System.out.println("CST WILL NOT BE PRINTED");
-            // Say how next part will not start
+            System.out.println("AST WILL NOT BE CREATED");
+            System.out.println("SEMANTIC ANALYSIS WILL NOT START");
+            System.out.println("CODE GENERATION WILL NOT START");
+
         }
     }
 
@@ -214,7 +220,7 @@ public class Parser {
 
     // Program ::== Block $ 
     public void parseProgram() {
-        System.out.println("->Parsing Program # " + this.myProgramNumber + "<-");
+        System.out.println("->Parsing Program #" + this.myProgramNumber + "<-");
         
         // get first token
         this.nextToken();

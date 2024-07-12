@@ -12,12 +12,14 @@ public class TempObject {
     private String myTempAddress; // Temporary Address of The Variable
     private char myVarName; // Variable Name 
     private int myOffset; // Offset For Placement
+    private int myScope; // Scope of Variable
 
     // Constructor
-    public TempObject(String newTempAddress, char newVarName, int newOffset) {
+    public TempObject(String newTempAddress, char newVarName, int newOffset, int newScope) {
         this.myTempAddress = newTempAddress;
         this.myVarName = newVarName;
         this.myOffset = newOffset;
+        this.myScope = newScope;
     }
 
     // Getter Methods
@@ -33,6 +35,10 @@ public class TempObject {
         return this.myOffset;
     }
 
+    public int getScope() {
+        return this.myScope;
+    }
+
     // Setter Methods
     public void setTempAddress(String newTempAddress) {
         this.myTempAddress = newTempAddress;
@@ -44,6 +50,10 @@ public class TempObject {
 
     public void setOffset(int newOffset) {
         this.myOffset = newOffset;
+    }
+
+    public void setScope(int newScope) {
+        this.myScope = newScope;
     }
     
 }

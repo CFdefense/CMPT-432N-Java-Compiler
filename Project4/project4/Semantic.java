@@ -20,6 +20,7 @@ public class Semantic {
     private SymbolTable mySymbolTable; // Instance of Symbol Table
     private int[] gramDigit; // Acceptable digit values
     private int myProgramNumber; // Current program 
+    private GenerateMachineCode myCodeGenerator;
 
     // Null Constructor
     public Semantic() {
@@ -31,6 +32,7 @@ public class Semantic {
         this.mySymbolTable = new SymbolTable();
         this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         this.myProgramNumber = 0;
+        this.myCodeGenerator = new GenerateMachineCode();
     }
 
     // Method For Overall Semantic Analysis Control
@@ -58,8 +60,11 @@ public class Semantic {
             // Display Table
             displaySymbolTable();
 
-            // Code Generation Call Here
+            // Load AST Into Code Generator
+            this.myCodeGenerator.setAST(myAST);
 
+            // Run Code Generator
+            this.myCodeGenerator.generateMyMachineCode();
         }
 
     }
@@ -349,9 +354,11 @@ public class Semantic {
     public void clear() {
         this.errorCount = 0;
         this.warningCount = 0;
+        this.myProgramNumber = 0;
         this.currentNode = null;
         this.mySymbolTable.clear();
-        this.myProgramNumber = 0;
+        this.myAST.clear();
+        this.myCodeGenerator.clear();
     }
 
     public void setProgramNumber(int newProgramNumber) {

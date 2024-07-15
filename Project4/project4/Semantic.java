@@ -325,7 +325,7 @@ public class Semantic {
                 for(Node child : currNode.getChildren()) {
                     child.setScope(currScope);
                 }
-                
+
                 //Arraylist to hold types of assignment
                 ArrayList<String> printTypes = new ArrayList<>();
 
@@ -375,7 +375,6 @@ public class Semantic {
         this.myProgramNumber = 0;
         this.currentNode = null;
         this.mySymbolTable.clear();
-        this.myAST.clear();
         this.myCodeGenerator.clear();
     }
 

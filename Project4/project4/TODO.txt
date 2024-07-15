@@ -30,3 +30,10 @@ TableForJumps
 
 
 ERRORS Check for Currtemp overload
+
+TODO ->
+
+1. Loading a = 1 + a -> TEST NOW (OVERLOAD FUNCTION)
+2. IF -> use Expr Overload function
+3. While -> use expr overload function
+4. BackPatching

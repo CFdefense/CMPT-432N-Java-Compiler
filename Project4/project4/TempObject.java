@@ -13,13 +13,15 @@ public class TempObject {
     private String myVarName; // Variable Name 
     private int myOffset; // Offset For Placement
     private int myScope; // scope of variable
+    private String myType; // type of variable
 
     // Constructor
-    public TempObject(String newTempAddress, String newVarName, int newOffset, int newScope) {
+    public TempObject(String newTempAddress, String newType, String newVarName, int newOffset, int newScope) {
         this.myTempAddress = newTempAddress;
         this.myVarName = newVarName;
         this.myOffset = newOffset;
         this.myScope = newScope;
+        this.myType = newType;
     }
 
     // Getter Methods
@@ -39,6 +41,10 @@ public class TempObject {
         return this.myScope;
     }
 
+    public String getType() {
+        return this.myType;
+    }
+
     // Setter Methods
     public void setTempAddress(String newTempAddress) {
         this.myTempAddress = newTempAddress;
@@ -56,4 +62,7 @@ public class TempObject {
         this.myScope = newScope;
     }
 
+    public void setType(String newType) {
+        this.myType = newType;
+    }
 }

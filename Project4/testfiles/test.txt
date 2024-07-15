@@ -2,9 +2,10 @@
 {
     /* Int Declaration */
     int a
+    a = 2
     int b
-    a = 1 + a
-    int c
+    string d
+    d = "alan"
     b=0
     /* While Loop */
     while (a != 3) {
@@ -12,7 +13,7 @@
         while(b != 3) {
             print(b)
             b = 1 + b
-            if (b == 2) {
+            if (1 + a == a) {
                 /* Print Statement */
                 print("there is no spoon" /* this will do nothing */)
             }

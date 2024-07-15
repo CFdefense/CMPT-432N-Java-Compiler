@@ -17,7 +17,7 @@
             string l
         }
         string g
-        print(b)
+        print(b == a)
     }
 }
 $

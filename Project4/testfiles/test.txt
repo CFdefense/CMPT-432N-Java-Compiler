@@ -3,7 +3,7 @@
     /* Int Declaration */
     int a
     int b
-    a = 0
+    a = 1 + a
     int c
     b=0
     /* While Loop */

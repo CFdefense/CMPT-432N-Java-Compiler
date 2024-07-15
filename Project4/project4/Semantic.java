@@ -66,7 +66,6 @@ public class Semantic {
             // Run Code Generator
             this.myCodeGenerator.generateMyMachineCode();
         }
-
     }
 
     // Semantic Analysis Method to Traverse AST and Preform Semantic Analysis
@@ -116,6 +115,9 @@ public class Semantic {
                 if(isDec == null) {
                     // Create symbol as first child is type and second is ID
                     this.mySymbolTable.createSymbol(currVarDecl.get(0).getType(), currVarDecl.get(1).getType(), currVarDecl.get(1).getLine());
+
+                    // Update the scope for the current node
+                    currNode.setScope(currScope);
                 } else {
                     // Throw error
                     System.out.println("ERROR: VARIABLE REDECLARED - [ " + currVarDecl.get(1).getType() + " ]");
@@ -128,6 +130,11 @@ public class Semantic {
 
                 // Get the children of assign
                 ArrayList<Node> currAssign = currNode.getChildren();
+
+                // Update Scopes of Children
+                for(Node child : currAssign) {
+                    child.setScope(currScope);
+                }
 
                 // First Child is the ID, check it has been declared
                 Symbol findings = this.mySymbolTable.search(currAssign.get(0).getType());
@@ -242,6 +249,12 @@ public class Semantic {
                 // Both isEq and isNEq children are expr so check if all on both sides are same type
                 // Get the children of equals
                 ArrayList<Node> currEquals = currNode.getChildren();
+
+                // Assign Scopes of Children
+                for(Node child : currEquals) {
+                    child.setScope(currScope);
+                }
+                
                 ArrayList<String> leftTypes = new ArrayList<>(); // ArrayList to hold all types of left node
                 ArrayList<String> rightTypes = new ArrayList<>(); // ArrayList to hold all types of right node
 
@@ -308,6 +321,11 @@ public class Semantic {
             case "Print":
                 // type check and declare check the children
 
+                // Update Scope of Children
+                for(Node child : currNode.getChildren()) {
+                    child.setScope(currScope);
+                }
+                
                 //Arraylist to hold types of assignment
                 ArrayList<String> printTypes = new ArrayList<>();
 

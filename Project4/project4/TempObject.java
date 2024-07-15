@@ -10,12 +10,12 @@ package project4;
 public class TempObject {
     // Private Instance Variables
     private String myTempAddress; // Temporary Address of The Variable
-    private char myVarName; // Variable Name 
+    private String myVarName; // Variable Name 
     private int myOffset; // Offset For Placement
-    private int myScope; // Scope of Variable
+    private int myScope; // scope of variable
 
     // Constructor
-    public TempObject(String newTempAddress, char newVarName, int newOffset, int newScope) {
+    public TempObject(String newTempAddress, String newVarName, int newOffset, int newScope) {
         this.myTempAddress = newTempAddress;
         this.myVarName = newVarName;
         this.myOffset = newOffset;
@@ -27,7 +27,7 @@ public class TempObject {
         return this.myTempAddress;
     }
 
-    public char getVarName() {
+    public String getVarName() {
         return this.myVarName;
     }
 
@@ -44,7 +44,7 @@ public class TempObject {
         this.myTempAddress = newTempAddress;
     }
 
-    public void setVarName(char newVarName) {
+    public void setVarName(String newVarName) {
         this.myVarName = newVarName;
     }
 
@@ -55,5 +55,5 @@ public class TempObject {
     public void setScope(int newScope) {
         this.myScope = newScope;
     }
-    
+
 }

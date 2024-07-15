@@ -1,6 +1,6 @@
 Project 4 -- 6502 Machine Code Generation
 
-Overall Objective -- AST -> Assembly -> Opcodes
+Overall Objective -- AST -> Opcodes
 
 GenerateMachineCode
 -> Byte Array Size 256 bytes
@@ -8,7 +8,7 @@ GenerateMachineCode
 -> Register x
 -> Register y
 --> Instructions
--> Translate to Assembly
+-> Traverse AST
 -> Translate to Opcodes
 -> BackPatch
 -> Fill Remaining Space
@@ -27,3 +27,6 @@ TableForJumps
 --> Read Code Stored from Top -> Down
 --> After Code is Stack
 --> Heap Stored Down -> Up
+
+
+ERRORS Check for Currtemp overload

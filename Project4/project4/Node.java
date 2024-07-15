@@ -15,6 +15,7 @@ public class Node {
     private Node myParent; // parent node
     private ArrayList<Node> myChildren; // list of child nodes
     private int myLine;
+    private int myScope;
 
     //! Start Node Construction
     
@@ -25,6 +26,7 @@ public class Node {
         this.myParent = null;
         this.myChildren = new ArrayList<Node>();
         this.myLine = -1;
+        this.myScope = -1;
     }
 
     // Semi Constructor
@@ -76,6 +78,10 @@ public class Node {
         this.myParent = newParent;
     }
 
+    public void setScope(int newScope) {
+        this.myScope = newScope;
+    }
+
     // Getter Methods
     public Node getParent() {
         return this.myParent;
@@ -95,6 +101,10 @@ public class Node {
 
     public int getLine() {
         return this.myLine;
+    }
+
+    public int getScope() {
+        return this.myScope;
     }
 
     // Method for adding children

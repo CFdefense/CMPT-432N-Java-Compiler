@@ -29,11 +29,13 @@ TableForJumps
 --> Heap Stored Down -> Up
 
 
-ERRORS Check for Currtemp overload
+POSSIBLE FUTURE IMPLEMENTATION/ERROR
+ERRORS Check for Currtemp/currJump overload
+EXPR ON BOTH SIDES Expr boolop Expr
 
 TODO ->
 
 1. Loading a = 1 + a -> TEST NOW (OVERLOAD FUNCTION)
-2. IF -> use Expr Overload function
-3. While -> use expr overload function
-4. BackPatching
+2. IF -> use Expr Overload function -> TEST NOW
+3. While -> use expr overload function TEST NOW
+4. BackPatching TEST NOW

@@ -10,12 +10,12 @@ package project4;
 public class JumpObject {
     // Private Instance Variables
     private String myTempAddress;
-    private int myJumpDistance;
+    private String myFinalAddress;
 
     // Constructor
     public JumpObject(String newTempAddress) {
         myTempAddress = newTempAddress;
-        myJumpDistance = -1; // temp  distance value 
+        myFinalAddress = ""; // temp  distance value 
     }
 
     // Getter Methods
@@ -23,8 +23,8 @@ public class JumpObject {
         return this.myTempAddress;
     }
 
-    public int getJumpDistance() {
-        return this.myJumpDistance;
+    public String getFinalAddress() {
+        return this.myFinalAddress;
     }
 
     // Setter Methods
@@ -32,8 +32,8 @@ public class JumpObject {
         this.myTempAddress = newTempAddress;
     }
 
-    public void setJumpDistance(int newJumpDistance) {
-        this.myJumpDistance = newJumpDistance;
+    public void setFinalAddress(String newFinalAddress) {
+        this.myFinalAddress = newFinalAddress;
     }
 
 

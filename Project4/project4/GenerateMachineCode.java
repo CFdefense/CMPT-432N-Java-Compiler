@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 public class GenerateMachineCode {
     
+    //! Start of Machine Code Generator Construction
+
     // Private Instance Variables
     private String[] myMemory; // Byte Array to hold the memory
     private ArrayList<TempObject> myStaticTable;
@@ -22,6 +24,7 @@ public class GenerateMachineCode {
     private int myProgramCounter; // Current Program Were on
     private int myErrorCount; // Error Count? Do we Need?
     private int currTemp; // Current Temp Variable Number
+    private int currJump; // Current Jump Variable Number
     private int[] gramDigit; // to store acceptable digits
     private String[] gramChar; // to store acceptable chars
 
@@ -39,10 +42,39 @@ public class GenerateMachineCode {
         this.currTemp = 0; // Initialize to 0 - start T0XX
         this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         this.gramChar = new String[26];
+        this.currJump = 0;
         for (char c = 'a'; c <= 'z'; c++) {
             this.gramChar[c - 'a'] = String.valueOf(c); // using ASCII
         }
-    }   
+    }  
+    
+    // Setter Methods
+    public void setAST(AST newAST) {
+        this.myAST = newAST;
+    }
+
+    public void setProgramCount(int newProgramCounter) {
+        this.myProgramCounter = newProgramCounter;
+    }
+
+    // Method For Clearing The Instance
+    public void clear() {
+        this.myMemory = new String[myMaxSize];
+        this.myStaticTable.clear();
+        this.myJumpTable.clear();
+        this.myCodePointer = 0;
+        this.myStackPointer = 0;
+        this.myHeapPointer = myMaxSize;
+        this.myAST = null;
+        this.myProgramCounter = 0;
+        this.myErrorCount = 0;
+        this.currJump = 0;
+        this.currTemp = 0;
+    } 
+
+    //! End of Machine Code Generator Construction
+
+    //! Start of Machine Code Functions and Methods
 
     // Method For Controlling all Steps of Code Generation
     public void generateMyMachineCode() {
@@ -50,10 +82,11 @@ public class GenerateMachineCode {
         // Generate Code By Recursively Analyzing The AST
         generateCode(this.myAST.getRoot());
 
-        // Generate Stack
+        // Generate Stack Pointer
+        this.myStackPointer = this.myCodePointer;
 
         // BackPatch -> Jumps then Static
-
+        backPatchJump();
         // Fill Zeros
     }
 
@@ -169,25 +202,59 @@ public class GenerateMachineCode {
             break;
 
             case "While Statement":
+                foundCase = true; // Will traverse down here to keep track of jump location
+
+                // Log Starting Address To Jump Back To
+                int jumpBackTo = this.myCodePointer;
+
+                // Load X Register with First -> Compare X with Second
+                loadCompareX(children);
+
+                // Log Number of Jump Object for BNE
+                int currWhileJump = currJump;
+
+                // Branch DNE
+                ifBranchCase(); 
+
+                // Do Loop contents by continuing down
+                if (!children.isEmpty() && !foundCase) {
+                    for (Node child : children) {
+                        generateCode(child);
+                    }
+                }
+            
+            // Jump back to the start of the comparison
+            this.myMemory[myCodePointer++] = "D0"; // BNE opcode for unconditional jump
+            int offset = jumpBackTo - (myCodePointer + 1); // Offset to jump back
+            this.myMemory[myCodePointer++] = String.format("%02X", offset & 0xFF); // Wrap to Fit 255
+
+
+            // Set While Condition Jump To After Block
+            updateJumpAddress(currWhileJump, this.myCodePointer);
 
             break;
 
             case "IF Statement":
-                // if(a==b) load X rgister with contents of a, compare x register to b, branch on not equal
-                // Add to jump table
-                // Determine both sides of boolop and then get memory addresses
+                foundCase = true; // Will traverse down here to keep track of jump location
 
-                // Get Valued Children
-                ArrayList<Node> ifChildren = children.get(0).getChildren();
+                // Load first Child into X Register -> Compare Second Child to X
+                loadCompareX(children);
 
-                // For Each Child
-                for(Node child : ifChildren) {
-                    // Is ID?
-                    String tempAddress = getTempAddress(child.getType(), child.getScope());
-                    // Otherwise write to heap
+                // Log current Jump Number
+                int currIfJump = currJump;
+
+                // Branch DNE
+                ifBranchCase();
+
+                // Recursively call on children
+                if (!children.isEmpty() && !foundCase) {
+                    for (Node child : children) {
+                        generateCode(child);
+                    }
                 }
-                
 
+                // Backpatch Jump for Logged Jump Number
+                updateJumpAddress(currIfJump, this.myCodePointer);
 
             break;
             case "Print":
@@ -202,7 +269,7 @@ public class GenerateMachineCode {
                     String heapAddress = String.format("%02X", myHeapPointer);
 
                     // Load register Y with address of Heap pointer
-                    LDYMemory(heapAddress, "00");
+                    LDYMemory(heapAddress, "00"); // Set 00 Flag to Only Use First Byte
                 } else {
                     // Were looking at an id -> find it
                     String tempAddress = getTempAddress(firstChild, firstScope);
@@ -249,7 +316,7 @@ public class GenerateMachineCode {
         return tempAddress;
     }
 
-    // Method to search Static Table For Variable Type
+    // Method to Search Static Table For a Variable's Type
     public String getStaticType(String varName, int varScope) {
         String varType = ""; // Resulting Type
 
@@ -264,6 +331,31 @@ public class GenerateMachineCode {
             }
         }
         return varType;
+    }
+
+    // Method to determine the type of a Node
+    public String getNodeType(Node valueNode) {
+        // Instance Variables
+        String nodeResult = "";
+        String nodeInfo = valueNode.getType();
+
+        // Check if ID
+        String isID = getTempAddress(nodeInfo, valueNode.getScope());
+        if(isID != null) {
+            nodeResult = "ID";
+        } else if(isDigit(nodeInfo)) {
+            // Check if Digit
+            nodeResult = "DIGIT";
+        } else if(nodeInfo.equalsIgnoreCase("true") || nodeInfo.equalsIgnoreCase("false")) {
+            // Check if BoolVal
+            nodeResult = "BOOLVAL";
+        } else if(nodeInfo.charAt(0) == '\"' && nodeInfo.charAt(nodeInfo.length() - 1) == '\"') {
+            // Check if String
+            nodeResult = "STRING";
+        }
+
+        // Return Resukt
+        return nodeResult;
     }
 
     // Method to determine if we have a digit
@@ -283,6 +375,82 @@ public class GenerateMachineCode {
             }
         }
         return foundDig;
+    }
+
+    // Method For If/While Statements Beginning Comparisons
+    public void loadCompareX(ArrayList<Node> children) {
+    // Load X Register w First, Compare X with Second, BNE or BEQ, Add JMP
+        // Get Valued Children
+        ArrayList<Node> ifChildren = children.get(0).getChildren();
+
+        // Get Types of Each Child
+        String childOneType = getNodeType(ifChildren.get(0));
+        String childTwoType = getNodeType(ifChildren.get(1));
+
+        // Load X Register with Contents of First Child
+        switch(childOneType) {
+            case "ID":
+                // Search Static Table for Temp Address
+                String tempAddress = getTempAddress(ifChildren.get(0).getType(), ifChildren.get(0).getScope());
+
+                // Get Bytes
+                String firstByte = tempAddress.substring(0, 2);
+                String secondByte = tempAddress.substring(2, 4);
+
+                // Load X Register w Memory
+                LDXMemory(firstByte, secondByte);
+
+                break;
+            case "DIGIT":
+                // Load Const Into X Register
+                LDXConst(ifChildren.get(0).getType());
+
+                break;
+            case "BOOLVAL":
+            case "STRING":
+                // Write to Heap and Load X Register w Location
+                writeToHeap(ifChildren.get(0).getType());
+
+                // Get Hex Heap Pointer
+                String heapAddress = String.format("%02X", myHeapPointer);
+
+                // Load X With Contents of First Child
+                LDXMemory(heapAddress, "00"); // Set 00 Flag to Only Use First Byte
+
+                break;
+        }
+
+        // Compare Contents of X with Second Child
+        switch(childTwoType) {
+            case "ID":
+                // Search Static Table for Temp Address
+                String tempAddress = getTempAddress(ifChildren.get(0).getType(), ifChildren.get(0).getScope());
+
+                // Get Bytes
+                String firstByte = tempAddress.substring(0, 2);
+                String secondByte = tempAddress.substring(2, 4);
+
+                // Compare X Register w Memory
+                CPXMemory(firstByte, secondByte);
+
+                break;
+            case "DIGIT":
+                // Compare X with Constant
+                CPXConst(children.get(1).getType());
+
+                break;
+            case "BOOLOP":
+            case "STRING":
+                // Write to Heap and Compare X With Second Child
+                writeToHeap(ifChildren.get(1).getType());
+
+                // Get Hex Heap Pointer
+                String heapAddress = String.format("%02X", myHeapPointer);
+
+                // Compare Contents of X With Second Child
+                CPXMemory(heapAddress, "00"); // Set 00 Flag to Only Use First Byte
+                break;
+        }
     }
 
     // Method to handle Expr Overload ie assignments such as a = 1 + 2 + a
@@ -326,7 +494,62 @@ public class GenerateMachineCode {
         // Store the Accumulator into Memory
         STAMemory(varName, varScope, varName, false, varFirstByte, varSecondByte);
     }
+
+    // Method to Write for BNE for If/While Statements
+    public void ifBranchCase() {
+        // Branch on Does Not Equal
+        this.myMemory[myCodePointer++] = "DO"; // BNE Op Code
+        this.myMemory[myCodePointer++] = "J" + currJump; // Temporary Jump Object
+
+        // Create and Add Temp Jump Object
+        this.myJumpTable.add(new JumpObject("J" + currJump++));
+    }
+
+    // Method to Find and Update Jump Objects
+    public void updateJumpAddress(int jumpNumber, int newLocation) {
+        // Get Hex Location Pointer
+        String newAddress = String.format("%02X", newLocation);
+
+        // Find Correct Jump Number
+        for(JumpObject currObj : this.myJumpTable) {
+            if(currObj.getTempAddress().equalsIgnoreCase("J" + jumpNumber)) {
+                currObj.setFinalAddress(newAddress); // Update Its New Final Address
+            }
+        }
+    }
+
+    // Method to Write a String to the Heap
+    public void writeToHeap(String value) {
+        this.myMemory[--myHeapPointer] = "00"; // Write 00 next up to seperate Strings
+
+        // Add each Characters Ascii Hex To The Heap
+        for(int i = value.length() - 2; i > 0; i--) { // skip first and last cause ""
+            this.myMemory[--myHeapPointer] = Integer.toHexString(value.charAt(i)).toUpperCase();
+        }
+    }
+
+    // Method to Backpatch Code With Final Jump Addresses
+    public void backPatchJump() {
+        // For each Jump Object
+        for(JumpObject currObj : this.myJumpTable) {
+           String jumpName = currObj.getTempAddress(); // Name to Look For
+
+           // Look For All Instances of temp address in Memory and Replace with Final Address
+           for(int i = 0; i < this.myMemory.length; i++) {
+
+                // IF we found the temp addres -> update its address
+                if(this.myMemory[i].equalsIgnoreCase(jumpName)) {
+                    this.myMemory[i] = currObj.getFinalAddress();
+                }
+           }
+
+        }
+    }
+
+    //! End of Machine Code Generator Function and Methods
+
     
+    //! Begin Assembly Methods
 
     // Method to Load Accumulator with Constant
     public void LDAConst(String value) {
@@ -443,6 +666,12 @@ public class GenerateMachineCode {
         }
     }
 
+    // Method to Write Compare X With Const -> Not in guide but needed?
+    public void CPXConst(String value) {
+        this.myMemory[this.myCodePointer++] = "E0"; // CPX Const Op Code
+        this.myMemory[this.myCodePointer++] = "0" + value; // write the digit
+    }
+
     // Method to Write SYS Call to Memory
     public void SYSCall() {
         this.myMemory[this.myCodePointer++] = "FF"; // Write SYS Call to Memory
@@ -453,36 +682,6 @@ public class GenerateMachineCode {
         this.myMemory[this.myCodePointer++] = "00"; // Write BRK Call to Memory
     }
 
-    // Method to Write a String to the Heap
-    public void writeToHeap(String value) {
-        this.myMemory[--myHeapPointer] = "00"; // Write 00 next up to seperate Strings
-
-        // Add each Characters Ascii Hex To The Heap
-        for(int i = value.length() - 2; i > 0; i--) { // skip first and last cause ""
-            this.myMemory[--myHeapPointer] = Integer.toHexString(value.charAt(i)).toUpperCase();
-        }
-    }
-
-    // Setter Methods
-    public void setAST(AST newAST) {
-        this.myAST = newAST;
-    }
-
-    public void setProgramCount(int newProgramCounter) {
-        this.myProgramCounter = newProgramCounter;
-    }
-
-    // Method For Clearing The Instance
-    public void clear() {
-        this.myMemory = new String[myMaxSize];
-        this.myStaticTable.clear();
-        this.myJumpTable.clear();
-        this.myCodePointer = 0;
-        this.myStackPointer = 0;
-        this.myHeapPointer = myMaxSize;
-        this.myAST = null;
-        this.myProgramCounter = 0;
-        this.myErrorCount = 0;
-    }
-
 }
+
+//! End of Assembly Methods

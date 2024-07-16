@@ -45,7 +45,7 @@ public class Semantic {
 
         // Begin Semantic Anaylsis
         System.out.println("\nSTARTING SEMANTIC ANALYSIS ON PROGRAM # " + this.myProgramNumber +  "...\n");
-        SemanticAnalysis(this.myAST.getRoot(), 0);
+        SemanticAnalysis(this.myAST.getRoot(), -1); // start at -1 to offset beginning
 
         // Update Warning Count With Unused Vars
         checkForUsed();

@@ -92,10 +92,20 @@ public class GenerateMachineCode {
 
         // BackPatch -> Jumps then Static
         backPatchJump();
+
+        // if there are some static variables
         backPatchStatic();
 
         // Fill Zeros
         fillZeros();
+
+        if(this.myErrorCount <= 0) {
+            System.out.println("MACHINE CODE SUCCESSFULL GENERATED FOR PROGRAM #" + this.myProgramCounter);
+            displayMachineCode();
+        } else {
+            System.out.println("PROGRAM #" + this.myProgramCounter + " MACHINE CODE GENERATION FAILED DUE TO " + this.myErrorCount + " Error(s)");
+            System.out.println("MACHINE CODE WILL NOT BE DISPLAYED...");
+        }
     }
 
     // Recursive Method For Generating Machine Code
@@ -152,12 +162,11 @@ public class GenerateMachineCode {
                 int varScope = children.get(0).getScope(); // First Child Scope
                 String varName = children.get(0).getType(); // First Child 
                 String varContents = children.get(1).getType(); // Second child
-                String firstTempAddress = getTempAddress(firstChild, varScope); // Temp Address of First Child
                 String firstType = getStaticType(firstChild, varScope); // Type of First Child
 
                 // Create Bytes From FoundTemp Location
-                String firstTempByte = firstTempAddress.substring(0, 2);
-                String secondTempByte = firstTempAddress.substring(2, 4);
+                String firstTempByte = getTempAddress(firstChild, varScope).substring(0, 2);
+                String secondTempByte = getTempAddress(firstChild, varScope).substring(2, 4);
             
                 switch(firstType) {
                     case "int":
@@ -225,7 +234,7 @@ public class GenerateMachineCode {
                 ifBranchCase(); 
 
                 // Do Loop contents by continuing down
-                if (!children.isEmpty() && !foundCase) {
+                if (!children.isEmpty()) {
                     for (Node child : children) {
                         generateCode(child);
                     }
@@ -278,21 +287,31 @@ public class GenerateMachineCode {
 
                     // Load register Y with address of Heap pointer
                     LDYMemory(heapAddress, "00"); // Set 00 Flag to Only Use First Byte
-                } else {
-                    // Were looking at an id -> find it
-                    String tempAddress = getTempAddress(firstChild, firstScope);
 
-                    String firstByte = tempAddress.substring(0, 2);
-                    String secondByte = tempAddress.substring(2, 4);
+                    // Load register X with 2 to signify there is a string to be read in Y
+                    LDXConst("2");
+                } else {
+                    // Were looking at an id -> get bytes
+                    String firstByte = getTempAddress(firstChild, firstScope).substring(0, 2);
+                    String secondByte = getTempAddress(firstChild, firstScope).substring(2, 4);
+
+                    // Get Type
+                    String type = getStaticType(firstChild, firstScope);
                     
                     //Load register Y with contents of print
                     LDYMemory(firstByte, secondByte);
-                } 
-                
-                //load x with 1
-                    LDXConst("1");
+
+                    // Check What Value to Load X With
+                    if(type.equalsIgnoreCase("string")) {
+                        LDXConst("2");
+                    } else {
+                        LDXConst("1");
+                    }
+                }
+
                 //SYS Call
-                    SYSCall();
+                SYSCall();
+
             break;
         }   
 
@@ -303,6 +322,23 @@ public class GenerateMachineCode {
             }
         }
 
+    }
+
+    // Method to Display The Memory
+    public void displayMachineCode() {
+        //Instance Variables
+        int linecounter = 0;
+
+        // Traverse Memory, printing all and a new line every 8 bytes
+        for(String curr : this.myMemory) {
+            System.out.print(curr + " ");
+            if(linecounter == 8) {
+                System.out.println("");
+                linecounter = 0;
+            } else {
+                linecounter++;
+            }
+        }
     }
 
     // Method to search Static Table For Variable Temp Address
@@ -444,7 +480,7 @@ public class GenerateMachineCode {
                 break;
             case "DIGIT":
                 // Compare X with Constant
-                CPXConst(children.get(1).getType());
+                CPXConst(ifChildren.get(1).getType());
 
                 break;
             case "BOOLOP":
@@ -539,14 +575,13 @@ public class GenerateMachineCode {
     }
 
     // Method to Backpatch Code With Final Jump Addresses
-    public void backPatchJump() {
+    public void backPatchJump() { 
         // For each Jump Object
         for(JumpObject currObj : this.myJumpTable) {
            String jumpName = currObj.getTempAddress(); // Name to Look For
 
            // Look For All Instances of temp address in Memory and Replace with Final Address
            for(int i = 0; i < this.myMemory.length; i++) {
-
                 // IF we found the temp addres -> update its address
                 if(this.myMemory[i].equalsIgnoreCase(jumpName)) {
                     this.myMemory[i] = currObj.getFinalAddress();
@@ -563,7 +598,7 @@ public class GenerateMachineCode {
             String newAddress = String.format("%02X", this.myStackPointer); // Get Hex Location Pointer
 
             // Look for matching temp address to replace
-            for(int i = 0; i < this.myMemory.length; i += 2) { // Go Every Two 
+            for(int i = 0; i < this.myCodePointer; i++) { // Go Every Two 
                 // Two Byte String to Be Compared
                 String currBytes = this.myMemory[i] + this.myMemory[i+1];
 

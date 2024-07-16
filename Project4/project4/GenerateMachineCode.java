@@ -22,7 +22,7 @@ public class GenerateMachineCode {
     private final int myMaxSize = 256; // Max Limited Byte Size of Memory
     private AST myAST; // AST to be Translated Into Machine Code
     private int myProgramCounter; // Current Program Were on
-    private int myErrorCount; // Error Count? Do we Need?
+    private int myErrorCount; // Error Count? Do I Need?
     private int currTemp; // Current Temp Variable Number
     private int currJump; // Current Jump Variable Number
     private int[] gramDigit; // to store acceptable digits
@@ -78,16 +78,24 @@ public class GenerateMachineCode {
 
     // Method For Controlling all Steps of Code Generation
     public void generateMyMachineCode() {
-        
+        // Starting Machine Code Generator
+        System.out.println("GENERATING MACHINE CODE FOR PROGRAM #" + this.myProgramCounter);
+
         // Generate Code By Recursively Analyzing The AST
         generateCode(this.myAST.getRoot());
+
+        // BRK At End
+        BRKCall();
 
         // Generate Stack Pointer
         this.myStackPointer = this.myCodePointer;
 
         // BackPatch -> Jumps then Static
         backPatchJump();
+        backPatchStatic();
+
         // Fill Zeros
+        fillZeros();
     }
 
     // Recursive Method For Generating Machine Code
@@ -457,15 +465,17 @@ public class GenerateMachineCode {
     public void handleExprOverload(ArrayList<Node> children, int varScope) {
         // Instance Variables
         boolean isFirstAddition = true; // Flag First Var For Indicating LDA
-        String varName = children.get(0).getType();
-        String varTempAddress = getTempAddress(varName, varScope);
-        String firstByte = varTempAddress.substring(0, 2);
-        String secondByte = varTempAddress.substring(2, 4);
+        String varName = children.get(0).getType(); // Get First Child Name
+        String varTempAddress = getTempAddress(varName, varScope); // Search First Child Address
+        String firstByte = varTempAddress.substring(0, 2); // First Byte
+        String secondByte = varTempAddress.substring(2, 4); // Second Byte
 
+        // For each Child
         for (int i = 1; i < children.size(); i++) {
-            Node currChild = children.get(i);
-            boolean isDigit = isDigit(currChild.getType());
+            Node currChild = children.get(i); // Child Node
+            boolean isDigit = isDigit(currChild.getType()); // Determine if the Child is a digit
 
+            // IF were a digit Load Const into Accumulator, or ADC if not first addition
             if (isDigit) {
                 if (isFirstAddition) {
                     LDAConst("0" + currChild.getType());
@@ -474,7 +484,7 @@ public class GenerateMachineCode {
                     ADCConst(currChild.getType()); // UPD
                 }
             } else {
-                String tempAddress = getTempAddress(currChild.getType(), currChild.getScope());
+                // If were a location Load Memory into Accumulator, or ADC if not first addition
                 if (isFirstAddition) {
                     LDAMemory(currChild, firstByte, secondByte);
                     isFirstAddition = false;
@@ -543,6 +553,38 @@ public class GenerateMachineCode {
                 }
            }
 
+        }
+    }
+
+    // Method for Back Patching Updated Addresses for Static Table Objects
+    public void backPatchStatic() {
+        for(TempObject currObj : this.myStaticTable) {
+            String tempAddress = currObj.getTempAddress(); // Get Temp Address of Static Object
+            String newAddress = String.format("%02X", this.myStackPointer); // Get Hex Location Pointer
+
+            // Look for matching temp address to replace
+            for(int i = 0; i < this.myMemory.length; i += 2) { // Go Every Two 
+                // Two Byte String to Be Compared
+                String currBytes = this.myMemory[i] + this.myMemory[i+1];
+
+                // If we Found The Temp Address
+                if(currBytes.equalsIgnoreCase(tempAddress)) {
+                    // Replace the Temp Address with New Address
+                    this.myMemory[i] = newAddress; // Important Byte First
+                    this.myMemory[i+1] = "00"; // 00
+                }
+            }
+        }
+    }
+
+    // Method to Fill Empty Bytes with Zeros
+    public void fillZeros() {
+        // Instance Variable
+        int zeroPointer = this.myCodePointer;
+
+        // Go From Code Pointer -> Heap Pointer and Fill Zeros
+        while(zeroPointer < this.myHeapPointer) {
+            this.myMemory[zeroPointer++] = "00"; // Set Zeros, Increment zeroPointer
         }
     }
 

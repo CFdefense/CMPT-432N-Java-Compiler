@@ -63,8 +63,13 @@ public class Semantic {
             // Load AST Into Code Generator
             this.myCodeGenerator.setAST(myAST);
 
+            // Set Program Counter
+            this.myCodeGenerator.setProgramCount(this.myProgramNumber);
+
             // Run Code Generator
             this.myCodeGenerator.generateMyMachineCode();
+
+            System.out.println("DEBUG");
         }
     }
 

@@ -27,6 +27,8 @@ public class GenerateMachineCode {
     private int currJump; // Current Jump Variable Number
     private int[] gramDigit; // to store acceptable digits
     private String[] gramChar; // to store acceptable chars
+    private int t2;
+    private int t1;
 
     // Null Constructor
     public GenerateMachineCode() {
@@ -35,7 +37,7 @@ public class GenerateMachineCode {
         this.myJumpTable = new ArrayList<>(); // Initialize ArrayList
         this.myCodePointer = 0; // Code Pointer Starts at Beginning
         this.myStackPointer = 0; // To Start After Code Pointer
-        this.myHeapPointer = myMaxSize; // Heap Pointer Starts at End
+        this.myHeapPointer = myMaxSize - 2; // Heap Pointer Starts at End - 2 for t1 and t2
         this.myAST = null; // To be Loaded in
         this.myProgramCounter = 0; // To be Updated
         this.myErrorCount = 0; // Initialize to 0
@@ -43,6 +45,8 @@ public class GenerateMachineCode {
         this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         this.gramChar = new String[26];
         this.currJump = 0;
+        this.t2 = 254;
+        this.t1 = 252;
         for (char c = 'a'; c <= 'z'; c++) {
             this.gramChar[c - 'a'] = String.valueOf(c); // using ASCII
         }
@@ -136,7 +140,7 @@ public class GenerateMachineCode {
 
                     // Generate Machine Code
                     LDAConst("00"); // LDA 0x00 Default
-                    STAMemory(varName, varScope, firstChild, true, "0", "0"); // STA Create New Entry
+                    STANMemory(firstChild, varName, varScope); // STA Create New Entry
 
                 break;
     
@@ -196,7 +200,7 @@ public class GenerateMachineCode {
                                     LDAConst("0" +(currChild.getType()));
     
                                     // STA Temporary Location
-                                    STAMemory(varName, varScope, firstChild, false, firstTempByte, secondTempByte);
+                                    STAEMemory(firstTempByte, secondTempByte);
                                 } else {
                                     // Its an ID
                                     LDAMemory(currChild, firstTempByte, secondTempByte);
@@ -212,11 +216,11 @@ public class GenerateMachineCode {
                         // if String write to heap -> then store static pointer
                         writeToHeap(varContents); // Writes String to Heap
 
-                        // Store the heap pointer as a 2-digit hex string -> First Byte
+                        // Store the heap pointer as a 2-digit hex string
                         String heapAddress = String.format("%02X", myHeapPointer);
 
                         LDAConst(String.valueOf(heapAddress)); // LDA Heap Pointer
-                        STAMemory(varName, varScope, firstChild, false, firstTempByte, secondTempByte); // STA Variable for String
+                        STAEMemory(firstTempByte, secondTempByte); // STA Variable for String
 
                     break;
                 }
@@ -230,7 +234,7 @@ public class GenerateMachineCode {
                 int jumpBackTo = this.myCodePointer;
 
                 // Load X Register with First -> Compare X with Second
-                loadCompareX(children);
+                loadCompareX(children); // If Conditions
 
                 // Log Number of Jump Object for BNE
                 int currWhileJump = currJump;
@@ -247,7 +251,8 @@ public class GenerateMachineCode {
             
             // Jump back to the start of the comparison
             this.myMemory[myCodePointer++] = "D0"; // BNE opcode for unconditional jump
-            this.myMemory[myCodePointer++] = String.format("%02X", jumpBackTo); // Wrap to Fit 255
+            int offset = jumpBackTo - (this.myCodePointer - 1);
+            this.myMemory[myCodePointer++] = String.format("%02X", offset & 0xFF); // Wrap to Fit 255
 
 
             // Set While Condition Jump To After Block
@@ -500,11 +505,11 @@ public class GenerateMachineCode {
                 // Load into A 
                 LDAConst("0" + ifChildren.get(1).getType());
 
-                // Store Memory Address
-                STAMemory(ifChildren.get(1).getType(), ifChildren.get(1).getScope() , "digit", true, "00", "00");
+                // Store Memory Address @ t2
+                STATMemory("0" + ifChildren.get(1).getType(), "00", this.t2);
 
                 //Compare X with Constant -> getting previous two bytes as memory address
-                CPXMemory(this.myMemory[this.myCodePointer - 2], this.myMemory[this.myCodePointer - 1]);
+                CPXMemory(this.myMemory[this.t2], this.myMemory[this.t2 + 1]);
 
                 break;
             case "BOOLOP":
@@ -562,7 +567,7 @@ public class GenerateMachineCode {
         String varSecondByte = varAddress.substring(2, 4);
 
         // Store the Accumulator into Memory
-        STAMemory(varName, varScope, varName, false, varFirstByte, varSecondByte);
+        STAEMemory(varFirstByte, varSecondByte);
     }
 
     // Method to Write for BNE for If/While Statements
@@ -660,25 +665,46 @@ public class GenerateMachineCode {
         this.myMemory[this.myCodePointer++] = value; // Default of 00
     }
 
-    // Method to Store the Accumulator in Memory
-    public void STAMemory(String newVarName, int newScope, String newType, boolean isNew, String firstByte, String secondByte) {
+    // Method to Store Accumulator in memory for a new Static var
+    public void STANMemory(String newType, String newVarName, int newScope) {
         // STA Temporary Location
         this.myMemory[this.myCodePointer++] = "8D"; // STA
 
-        if(isNew) {
-            // If Were Making a New Static Entry
-            this.myMemory[this.myCodePointer++] = ('T' + String.valueOf(currTemp)); // Temp Location Number
-            this.myMemory[this.myCodePointer++] = "XX"; // Temporary Byte 
-    
-            // Add to Static Table
-            this.myStaticTable.add(new TempObject(("T" + this.currTemp + "XX"), newType, newVarName, this.currTemp, newScope));
-    
-            // Increment Current Temporary Value Counter
-            this.currTemp++;
-        } else {
-            // Existing Static Entry
-            this.myMemory[this.myCodePointer++] = firstByte;
-            this.myMemory[this.myCodePointer++] = secondByte;
+        // If Were Making a New Static Entry
+        this.myMemory[this.myCodePointer++] = ('T' + String.valueOf(currTemp)); // Temp Location Number
+        this.myMemory[this.myCodePointer++] = "XX"; // Temporary Byte 
+
+        // Add to Static Table
+        this.myStaticTable.add(new TempObject(("T" + this.currTemp + "XX"), newType, newVarName, this.currTemp, newScope));
+
+        // Increment Current Temporary Value Counter
+        this.currTemp++;
+    }
+
+    // Method to Store Existing Static Var in Memory
+    public void STAEMemory(String firstByte, String secondByte) {
+        // STA Temporary Location
+        this.myMemory[this.myCodePointer++] = "8D"; // STA
+
+        // Existing Static Entry
+        this.myMemory[this.myCodePointer++] = firstByte;
+        this.myMemory[this.myCodePointer++] = secondByte;
+        
+    }
+
+    public void STATMemory(String firstByte, String secondByte, int tNumber) {
+        // STA Temporary Location
+        this.myMemory[this.myCodePointer++] = "8D"; // STA
+
+        // Existing Static Entry
+        if(tNumber == 254) {
+            //T2
+            this.myMemory[this.t2] = firstByte;
+            this.myMemory[this.t2 + 1] = secondByte;
+        } else if(tNumber == 242) {
+            //T1
+            this.myMemory[this.t1] = firstByte;
+            this.myMemory[this.t1 + 1] = secondByte;
         }
         
     }

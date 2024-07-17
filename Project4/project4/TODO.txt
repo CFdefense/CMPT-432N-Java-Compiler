@@ -33,6 +33,9 @@ POSSIBLE FUTURE IMPLEMENTATION/ERROR
 ERRORS Check for Currtemp/currJump overload
 CHECK FOR STACK OVERFLOW!!
 
+0xFF seems to the be address for holding digits ie while accumulators/if digits t2
+and one before is t1
+
 EXPR ON BOTH SIDES Expr boolop Expr
 
 TODO ->

@@ -31,6 +31,8 @@ TableForJumps
 
 POSSIBLE FUTURE IMPLEMENTATION/ERROR
 ERRORS Check for Currtemp/currJump overload
+CHECK FOR STACK OVERFLOW!!
+
 EXPR ON BOTH SIDES Expr boolop Expr
 
 TODO ->

@@ -186,12 +186,17 @@ public class GenerateMachineCode {
                                     
                                 // Depending on found dig or not do the following
                                 if(foundDig) {
-                                    // LDA Constant Value
+                                    // Check if variable has been declared and memory can be optimized
+                                    boolean canOptimize = tryOptimization(firstTempByte, secondTempByte);
+                                    if(canOptimize == true) {
+                                        // move codepointer to override previous declaration
+                                        this.myCodePointer -= 5;
+                                    }
+                                    // LDA Const Value
                                     LDAConst("0" +(currChild.getType()));
     
                                     // STA Temporary Location
                                     STAMemory(varName, varScope, firstChild, false, firstTempByte, secondTempByte);
-    
                                 } else {
                                     // Its an ID
                                     LDAMemory(currChild, firstTempByte, secondTempByte);
@@ -207,7 +212,7 @@ public class GenerateMachineCode {
                         // if String write to heap -> then store static pointer
                         writeToHeap(varContents); // Writes String to Heap
 
-                        // Store the heap pointer as a 2-digit hex string
+                        // Store the heap pointer as a 2-digit hex string -> First Byte
                         String heapAddress = String.format("%02X", myHeapPointer);
 
                         LDAConst(String.valueOf(heapAddress)); // LDA Heap Pointer
@@ -242,8 +247,7 @@ public class GenerateMachineCode {
             
             // Jump back to the start of the comparison
             this.myMemory[myCodePointer++] = "D0"; // BNE opcode for unconditional jump
-            int offset = jumpBackTo - (myCodePointer + 1); // Offset to jump back
-            this.myMemory[myCodePointer++] = String.format("%02X", offset & 0xFF); // Wrap to Fit 255
+            this.myMemory[myCodePointer++] = String.format("%02X", jumpBackTo); // Wrap to Fit 255
 
 
             // Set While Condition Jump To After Block
@@ -421,6 +425,20 @@ public class GenerateMachineCode {
         return foundDig;
     }
 
+    // Method For Optimizing Declaration and Initialization Subsequent Instructions
+    public boolean tryOptimization(String firstTempByte, String secondTempByte) {
+        boolean result = true; // default true
+        int currPointer = this.myCodePointer - 1;
+        // Get Expected for Optimization
+        String[] expected = new String[]{"A9", "00", "8D", firstTempByte, secondTempByte};
+        for(int i = expected.length - 1; i >= 0; i--) {
+            if(!this.myMemory[currPointer--].equalsIgnoreCase(expected[i])) {
+                result = false;
+            }
+        }
+        return result;
+    }
+
     // Method For If/While Statements Beginning Comparisons
     public void loadCompareX(ArrayList<Node> children) {
     // Load X Register w First, Compare X with Second, BNE or BEQ, Add JMP
@@ -479,8 +497,14 @@ public class GenerateMachineCode {
 
                 break;
             case "DIGIT":
-                // Compare X with Constant
-                CPXConst(ifChildren.get(1).getType());
+                // Load into A 
+                LDAConst("0" + ifChildren.get(1).getType());
+
+                // Store Memory Address
+                STAMemory(ifChildren.get(1).getType(), ifChildren.get(1).getScope() , "digit", true, "00", "00");
+
+                //Compare X with Constant -> getting previous two bytes as memory address
+                CPXMemory(this.myMemory[this.myCodePointer - 2], this.myMemory[this.myCodePointer - 1]);
 
                 break;
             case "BOOLOP":
@@ -544,7 +568,7 @@ public class GenerateMachineCode {
     // Method to Write for BNE for If/While Statements
     public void ifBranchCase() {
         // Branch on Does Not Equal
-        this.myMemory[myCodePointer++] = "DO"; // BNE Op Code
+        this.myMemory[myCodePointer++] = "D0"; // BNE Op Code
         this.myMemory[myCodePointer++] = "J" + currJump; // Temporary Jump Object
 
         // Create and Add Temp Jump Object
@@ -581,7 +605,7 @@ public class GenerateMachineCode {
            String jumpName = currObj.getTempAddress(); // Name to Look For
 
            // Look For All Instances of temp address in Memory and Replace with Final Address
-           for(int i = 0; i < this.myMemory.length; i++) {
+           for(int i = 0; i < this.myCodePointer; i++) {
                 // IF we found the temp addres -> update its address
                 if(this.myMemory[i].equalsIgnoreCase(jumpName)) {
                     this.myMemory[i] = currObj.getFinalAddress();
@@ -609,6 +633,7 @@ public class GenerateMachineCode {
                     this.myMemory[i+1] = "00"; // 00
                 }
             }
+            this.myStackPointer++; // get next address
         }
     }
 
@@ -741,12 +766,6 @@ public class GenerateMachineCode {
             // Heap Memory Address
             this.myMemory[this.myCodePointer++] = firstByte;
         }
-    }
-
-    // Method to Write Compare X With Const -> Not in guide but needed?
-    public void CPXConst(String value) {
-        this.myMemory[this.myCodePointer++] = "E0"; // CPX Const Op Code
-        this.myMemory[this.myCodePointer++] = "0" + value; // write the digit
     }
 
     // Method to Write SYS Call to Memory

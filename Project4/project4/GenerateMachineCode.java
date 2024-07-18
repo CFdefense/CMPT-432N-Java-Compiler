@@ -700,11 +700,11 @@ public class GenerateMachineCode {
         this.myMemory[this.myCodePointer++] = "AD"; // LDA Memory
 
         // Find Temporary Memory of the ID
-        String childTempAddress = getTempAddress(.getType(), currChild.getScope());
+        String childTempAddress = getTempAddress(currChild.getType(), currChild.getScope());
 
         // Create Bytes From FoundTemp Location
         String firstByte = childTempAddress.substring(0, 2);
-        String  secondByte = childTempAddress.substring(2, 4);
+        String secondByte = childTempAddress.substring(2, 4);
 
         // LDA Memory Address
         this.myMemory[this.myCodePointer++] = firstByte;

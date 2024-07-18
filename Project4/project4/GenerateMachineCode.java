@@ -28,7 +28,7 @@ public class GenerateMachineCode {
     private int[] gramDigit; // to store acceptable digits
     private String truePointer; // Hex Pointer to 'true'
     private String falsePointer; // Hex Pointer to 'false'
-
+    private String endPointer; // Hex Pointer to last byte for use
 
     // Null Constructor
     public GenerateMachineCode() {
@@ -37,7 +37,7 @@ public class GenerateMachineCode {
         this.myJumpTable = new ArrayList<>(); // Initialize ArrayList
         this.myCodePointer = 0; // Code Pointer Starts at Beginning
         this.myStackPointer = 0; // To Start After Code Pointer
-        this.myHeapPointer = myMaxSize - 10; // Heap Pointer Starts at End
+        this.myHeapPointer = myMaxSize - 12; // Heap Pointer Starts at End
         this.myAST = null; // To be Loaded in
         this.myProgramCounter = 0; // To be Updated
         this.myErrorCount = 0; // Initialize to 0
@@ -46,22 +46,25 @@ public class GenerateMachineCode {
         this.currJump = 0; // Current Jump Object
 
         // Initialize true and false
-        this.myMemory[255] = "00";
-        this.myMemory[254] = "65"; // e
-        this.myMemory[253] = "75"; // u
-        this.myMemory[252] = "72"; // r
-        this.myMemory[251] = "74"; // t
-        this.myMemory[250] = "00"; // divider
-        this.myMemory[249] = "65"; // e
-        this.myMemory[248] = "73"; // s
-        this.myMemory[247] = "6C"; // l
-        this.myMemory[246] = "61"; // a
-        this.myMemory[245] = "66"; // f
+        this.myMemory[254] = "00";
+        this.myMemory[253] = "65"; // e
+        this.myMemory[252] = "75"; // u
+        this.myMemory[251] = "72"; // r
+        this.myMemory[250] = "74"; // t
+        this.myMemory[249] = "00"; // divider
+        this.myMemory[248] = "65"; // e
+        this.myMemory[247] = "73"; // s
+        this.myMemory[246] = "6C"; // l
+        this.myMemory[245] = "61"; // a
+        this.myMemory[244] = "66"; // f
 
         // Initialize true and false pointers
-        this.truePointer = String.valueOf(String.format("%02X", 251));
-        this.falsePointer = String.valueOf(String.format("%02X", 246));
+        this.truePointer = String.valueOf(String.format("%02X", 250));
+        this.falsePointer = String.valueOf(String.format("%02X", 244));
 
+        // Initialize end pointer
+        this.endPointer = String.valueOf(String.format("%02X", 255));
+        this.myMemory[255] = "00"; // initialize to 00
     }  
     
     // Setter Methods
@@ -237,46 +240,111 @@ public class GenerateMachineCode {
 
     // Method For Generating Machine Code For While Statements
     public void whileStatement(ArrayList<Node> children) {
+
+        // Get Type of Comparison Being Made
+        String comparisonType = children.get(0).getType();
+
         // Log Starting Address To Jump Back To
         int jumpBackTo = this.myCodePointer;
 
         // Load X Register with First -> Compare X with Second
         loadCompareX(children); // If Conditions
 
+        // If Were looking at a != Comparison 
+        if(comparisonType.equalsIgnoreCase("isNotEq")) {
+            // Reset Accumulator
+            LDAConst("00");
+
+            // Branch DNE 02?
+            BNE("02");
+
+            // LDA Accumulator 01
+            LDAConst("01");
+
+            // Reset X Register
+            LDXConst("0");
+
+            // Store Accumulator at End Pointer
+            STAEMemory(endPointer, "00");
+
+            // Compare X register and End Pointr
+            CPXMemory("00", "00", true);
+        }
+
         // Log Number of Jump Object for BNE
         int currWhileJump = currJump;
 
-        // Branch DNE
-        BNE(); 
+        // Branch DNE To Post Branch 
+        BNE(""); 
 
         // Do Loop contents by continuing down
         goDownTree(children, false, false);
     
-        // Jump back to the start of the comparison
-        this.myMemory[myCodePointer++] = "D0"; // BNE opcode for unconditional jump
-        int offset = jumpBackTo - (this.myCodePointer - 1);
-        this.myMemory[myCodePointer++] = String.format("%02X", offset & 0xFF); // Wrap to Fit 255
-
         // Set While Condition Jump To After Block
         updateJumpAddress(currWhileJump, this.myCodePointer);
+
+        // Reset Accumulator
+        LDAConst("00");
+
+        // Store Accumulator at End Pointer
+        STAEMemory(endPointer, "00");
+
+        // LDX With 1
+        LDXConst("1");
+
+        // Compare X With End Pointer
+        CPXMemory("00", "00", true);
+
+        // Jump back to the start of the comparison
+        this.myMemory[myCodePointer++] = "D0"; // BNE opcode for unconditional jump
+        int offset = jumpBackTo - (this.myCodePointer + 1);
+        this.myMemory[myCodePointer++] = String.format("%02X", offset & 0xFF); // Wrap to Fit 255
     }
 
     // Method For Generating Machine Code For If Statements
     public void ifStatement(ArrayList<Node> children) {
         // Load first Child into X Register -> Compare Second Child to X
+
+        // Get Type of Comparison Being Made
+        String comparisonType = children.get(0).getType();
+
         loadCompareX(children);
 
+        // If Were looking at a != Comparison 
+        if(comparisonType.equalsIgnoreCase("isNotEq")) {
+            // Reset Accumulator
+            LDAConst("00");
+
+            // Branch DNE 02?
+            BNE("02");
+
+            // LDA Accumulator 01
+            LDAConst("01");
+
+            // Reset X Register
+            LDXConst("0");
+
+            // Store Accumulator at End Pointer
+            STAEMemory(endPointer, "00");
+
+            // Compare X register and End Pointr
+            CPXMemory("00", "00", true);
+        }
+        
         // Log current Jump Number
         int currIfJump = currJump;
 
-        // Branch DNE
-        BNE();
+        // Branch DNE To Post Bracket
+        BNE("");
+        
+        // Log current Code Pointer For Jump
+        int logPointer = this.myCodePointer;
 
         // Recursively call on children
         goDownTree(children, false, false);
 
         // Backpatch Jump for Logged Jump Number
-        updateJumpAddress(currIfJump, this.myCodePointer);
+        updateJumpAddress(currIfJump, this.myCodePointer - logPointer);
     }
 
     // Method For Generating Machine Code For Print Statements
@@ -496,18 +564,18 @@ public class GenerateMachineCode {
                 String secondByte = tempAddress.substring(2, 4);
 
                 // Compare X Register w Memory
-                CPXMemory(firstByte, secondByte);
+                CPXMemory(firstByte, secondByte, false);
 
                 break;
             case "DIGIT":
                 // Load into A 
                 LDAConst("0" + ifChildren.get(1).getType());
 
-                // Store Memory Address @ t2
-                STAEMemory(ifChildren.get(1).getType(), "00");
+                // Store Memory Address
+                STAEMemory(this.endPointer, "00");
 
                 //Compare X with Constant -> getting previous two bytes as memory address
-                CPXMemory(this.myMemory[this.myCodePointer - 1], this.myMemory[this.myCodePointer - 2]);
+                CPXMemory(this.myMemory[this.myCodePointer - 1], this.myMemory[this.myCodePointer - 2], true);
 
                 break;
             case "BOOLOP":
@@ -516,7 +584,7 @@ public class GenerateMachineCode {
                 writeToHeap(ifChildren.get(1).getType());
 
                 // Compare Contents of X With Second Child
-                CPXMemory(String.format("%02X", myHeapPointer), "00"); // Set 00 Flag to Only Use First Byte
+                CPXMemory(String.format("%02X", myHeapPointer), "00", false); // Set 00 Flag to Only Use First Byte
                 break;
         }
     }
@@ -566,13 +634,19 @@ public class GenerateMachineCode {
     }
 
     // Method to Write for BNE for If/While Statements
-    public void BNE() {
-        // Branch on Does Not Equal
-        this.myMemory[myCodePointer++] = "D0"; // BNE Op Code
-        this.myMemory[myCodePointer++] = "J" + currJump; // Temporary Jump Object
+    public void BNE(String location) {
+        if(location.equalsIgnoreCase("")) {
+            // Branch on Does Not Equal
+            this.myMemory[myCodePointer++] = "D0"; // BNE Op Code
+            this.myMemory[myCodePointer++] = "J" + currJump; // Temporary Jump Object
 
-        // Create and Add Temp Jump Object
-        this.myJumpTable.add(new JumpObject("J" + currJump++));
+            // Create and Add Temp Jump Object
+            this.myJumpTable.add(new JumpObject("J" + currJump++));
+        } else {
+            this.myMemory[myCodePointer++] = "D0"; // BNE Op Code
+            this.myMemory[myCodePointer++] = location; // Jump Destination
+        }
+        
     }
 
     // Method to Find and Update Jump Objects
@@ -753,17 +827,21 @@ public class GenerateMachineCode {
         }
     }
 
-    // Method to Write EC And Its Comparing Address to Memory
-    public void CPXMemory(String firstByte, String secondByte) {
+    // Method to Compare X Register to Address in Memory
+    public void CPXMemory(String firstByte, String secondByte, boolean isEnd) {
         this.myMemory[this.myCodePointer++] = "EC"; // CPX Op code
-
-        // Check if were using Temp Memory Address
-        if(firstByte.charAt(0) == 'T' && secondByte.charAt(1) == 'X') {
-            this.myMemory[this.myCodePointer++] = firstByte;
-            this.myMemory[this.myCodePointer++] = secondByte;
+        if(isEnd) {
+            this.myMemory[this.myCodePointer++] = this.endPointer;
+            this.myMemory[this.myCodePointer++] = "00";
         } else {
-            // Heap Memory Address
-            this.myMemory[this.myCodePointer++] = firstByte;
+            // Check if were using Temp Memory Address
+            if(firstByte.charAt(0) == 'T' && secondByte.charAt(1) == 'X') {
+                this.myMemory[this.myCodePointer++] = firstByte;
+                this.myMemory[this.myCodePointer++] = secondByte;
+            } else {
+                // Heap Memory Address
+                this.myMemory[this.myCodePointer++] = firstByte;
+            }
         }
     }
 

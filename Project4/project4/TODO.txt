@@ -32,12 +32,8 @@ TableForJumps
 POSSIBLE FUTURE IMPLEMENTATION/ERROR
 ERRORS Check for Currtemp/currJump overload
 CHECK FOR STACK OVERFLOW/OVERWRITING!!
-
-0xFF seems to the be address for holding digits ie while accumulators/if digits t2
-and one before is t1
-
 EXPR ON BOTH SIDES Expr boolop Expr
 
 TODO ->
 
-1. IF Staments true/false storing
+TEST EVERY POSSIBLE FUCKING CASE

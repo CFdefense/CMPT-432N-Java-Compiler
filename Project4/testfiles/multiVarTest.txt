@@ -1,0 +1,9 @@
+{
+    int a
+    a = 1
+    while (a != 5) {
+        a = 1 + a
+        print(a)
+    }
+}
+$

@@ -26,9 +26,6 @@ public class GenerateMachineCode {
     private int currTemp; // Current Temp Variable Number
     private int currJump; // Current Jump Variable Number
     private int[] gramDigit; // to store acceptable digits
-    private String[] gramChar; // to store acceptable chars
-    private int t2;
-    private int t1;
 
     // Null Constructor
     public GenerateMachineCode() {
@@ -37,19 +34,13 @@ public class GenerateMachineCode {
         this.myJumpTable = new ArrayList<>(); // Initialize ArrayList
         this.myCodePointer = 0; // Code Pointer Starts at Beginning
         this.myStackPointer = 0; // To Start After Code Pointer
-        this.myHeapPointer = myMaxSize - 2; // Heap Pointer Starts at End - 2 for t1 and t2
+        this.myHeapPointer = myMaxSize; // Heap Pointer Starts at End
         this.myAST = null; // To be Loaded in
         this.myProgramCounter = 0; // To be Updated
         this.myErrorCount = 0; // Initialize to 0
         this.currTemp = 0; // Initialize to 0 - start T0XX
-        this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-        this.gramChar = new String[26];
-        this.currJump = 0;
-        this.t2 = 254;
-        this.t1 = 252;
-        for (char c = 'a'; c <= 'z'; c++) {
-            this.gramChar[c - 'a'] = String.valueOf(c); // using ASCII
-        }
+        this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}; // Acceptable Digits
+        this.currJump = 0; // Current Jump Object
     }  
     
     // Setter Methods
@@ -103,234 +94,194 @@ public class GenerateMachineCode {
         // Fill Zeros
         fillZeros();
 
-        if(this.myErrorCount <= 0) {
-            System.out.println("MACHINE CODE SUCCESSFULL GENERATED FOR PROGRAM #" + this.myProgramCounter);
-            displayMachineCode();
-        } else {
-            System.out.println("PROGRAM #" + this.myProgramCounter + " MACHINE CODE GENERATION FAILED DUE TO " + this.myErrorCount + " Error(s)");
-            System.out.println("MACHINE CODE WILL NOT BE DISPLAYED...");
-        }
+        displayMachineCode();
     }
 
     // Recursive Method For Generating Machine Code
     public void generateCode(Node currNode) {
-        // Instance Variables
-        boolean foundCase = false;
-        String currType = currNode.getType(); // Curr Node Type
-        ArrayList<Node> children = currNode.getChildren(); // Children of Node
-        if (children.isEmpty()) {
-            return; // Early exit if there are no children
+        // Immediately Leave if No Children
+        if(currNode.getChildren().size() == 0) {
+            return;
         }
-        String firstChild = children.get(0).getType(); // First Child
-        int firstScope = children.get(0).getScope();
-        System.out.println("Curr Node: " + currType);
+        // Instance Variables
+        boolean foundCase = false; // Flag for Finding Case
+        String currType = currNode.getType(); // Current Case Node Type
+        ArrayList<Node> children = currNode.getChildren(); // Children of Node
+        String firstChildType = children.get(0).getType(); // First Child Type
+        int firstChildScope = children.get(0).getScope(); // First Child Scope
+        String firstChildName = children.get(0).getType(); // First Child Name
+        String firstType = getStaticType(firstChildType, firstChildScope); // Type of First Child
 
+        // Debug
+        System.out.println("Curr Node: " + currType);
 
         // Generate Machine Code Per Situation
         switch(currType) {
             case "VarDecl":
                 foundCase = true; // Update so we dont continue down the tree
-            // Determine Type and Generate Accordingly
-            switch(firstChild) {
-                case "int":
-                case "boolean":
-                    // Instance Variables
-                    int varScope = children.get(0).getScope(); // First Child Scope
-                    String varName = children.get(1).getType(); // Second Child
-
+                String secondChildType = children.get(1).getType(); // Second Child Type
+                // if int or boolean
+                if(firstChildType.equalsIgnoreCase("int") || firstChildType.equalsIgnoreCase("boolean")) {
                     // Generate Machine Code
                     LDAConst("00"); // LDA 0x00 Default
-                    STANMemory(firstChild, varName, varScope); // STA Create New Entry
-
+                    STANMemory(firstChildType, secondChildType, firstChildScope); // STA Create New Entry
+                } else {
+                    // string -> Add to Static Table & Increment Current Temporary Value Counter
+                    this.myStaticTable.add(new TempObject(("T" + this.currTemp + "XX"), firstChildType, firstChildName, this.currTemp++, firstChildScope));
+                }    
                 break;
-    
-                case "string":
-                    // Instance Variables
-                    int varSScope = children.get(0).getScope(); // First Child Scope
-                    String varSName = children.get(1).getType(); // Second Child
-
-                    // Add to Static Table
-                    this.myStaticTable.add(new TempObject(("T" + this.currTemp + "XX"), firstChild, varSName, this.currTemp, varSScope));
-
-                    // Increment Current Temporary Value Counter
-                    this.currTemp++;
-
-                break;
-            }
-
-            break;
-
             case "Assignment":
-                foundCase = true; // Update so we dont continue down the tree
-                // Instance Variables
-                int varScope = children.get(0).getScope(); // First Child Scope
-                String varName = children.get(0).getType(); // First Child 
-                String varContents = children.get(1).getType(); // Second child
-                String firstType = getStaticType(firstChild, varScope); // Type of First Child
-
-                // Create Bytes From FoundTemp Location
-                String firstTempByte = getTempAddress(firstChild, varScope).substring(0, 2);
-                String secondTempByte = getTempAddress(firstChild, varScope).substring(2, 4);
-            
-                switch(firstType) {
-                    case "int":
-                    case "boolean":
-                        // Check if there are more than two children use - ADC
-                        if(children.size() > 2) {
-                            handleExprOverload(children, varScope);
-                        } else {
-                            // If Children count is 2 or less use LDA
-
-                            // For Each Child Determine Type
-                            for(int i = 1; i < children.size(); i++) {
-                                Node currChild = children.get(i); // Get Curr Child starting at second
-
-                                // Determine if were looking at a digit
-                                boolean foundDig = isDigit(currChild.getType());
-                                    
-                                // Depending on found dig or not do the following
-                                if(foundDig) {
-                                    // Check if variable has been declared and memory can be optimized
-                                    boolean canOptimize = tryOptimization(firstTempByte, secondTempByte);
-                                    if(canOptimize == true) {
-                                        // move codepointer to override previous declaration
-                                        this.myCodePointer -= 5;
-                                    }
-                                    // LDA Const Value
-                                    LDAConst("0" +(currChild.getType()));
-    
-                                    // STA Temporary Location
-                                    STAEMemory(firstTempByte, secondTempByte);
-                                } else {
-                                    // Its an ID
-                                    LDAMemory(currChild, firstTempByte, secondTempByte);
-                                }
-                        }
-
-                        
-                        }
-
-                    break;
-
-                    case "string":
-                        // if String write to heap -> then store static pointer
-                        writeToHeap(varContents); // Writes String to Heap
-
-                        // Store the heap pointer as a 2-digit hex string
-                        String heapAddress = String.format("%02X", myHeapPointer);
-
-                        LDAConst(String.valueOf(heapAddress)); // LDA Heap Pointer
-                        STAEMemory(firstTempByte, secondTempByte); // STA Variable for String
-
-                    break;
+                // If the First Childs Type is Int or Boolean
+                if(firstType.equalsIgnoreCase("int") || firstType.equalsIgnoreCase("boolean")) {
+                    boolIntAssignment(children, firstChildType, firstChildScope);
+                } else {
+                // If the First Childs Type is String
+                    String secondAChildType = children.get(1).getType();
+                    stringAssignment(secondAChildType, firstChildType, firstChildScope);
                 }
-
-            break;
-
+                break;
             case "While Statement":
-                foundCase = true; // Will traverse down here to keep track of jump location
-
-                // Log Starting Address To Jump Back To
-                int jumpBackTo = this.myCodePointer;
-
-                // Load X Register with First -> Compare X with Second
-                loadCompareX(children); // If Conditions
-
-                // Log Number of Jump Object for BNE
-                int currWhileJump = currJump;
-
-                // Branch DNE
-                ifBranchCase(); 
-
-                // Do Loop contents by continuing down
-                if (!children.isEmpty()) {
-                    for (Node child : children) {
-                        generateCode(child);
-                    }
-                }
-            
-            // Jump back to the start of the comparison
-            this.myMemory[myCodePointer++] = "D0"; // BNE opcode for unconditional jump
-            int offset = jumpBackTo - (this.myCodePointer - 1);
-            this.myMemory[myCodePointer++] = String.format("%02X", offset & 0xFF); // Wrap to Fit 255
-
-
-            // Set While Condition Jump To After Block
-            updateJumpAddress(currWhileJump, this.myCodePointer);
-
-            break;
-
+                foundCase = true; // Update Flag
+                whileStatement(children);
+                break;
             case "IF Statement":
                 foundCase = true; // Will traverse down here to keep track of jump location
-
-                // Load first Child into X Register -> Compare Second Child to X
-                loadCompareX(children);
-
-                // Log current Jump Number
-                int currIfJump = currJump;
-
-                // Branch DNE
-                ifBranchCase();
-
-                // Recursively call on children
-                if (!children.isEmpty() && !foundCase) {
-                    for (Node child : children) {
-                        generateCode(child);
-                    }
-                }
-
-                // Backpatch Jump for Logged Jump Number
-                updateJumpAddress(currIfJump, this.myCodePointer);
-
-            break;
+                ifStatement(children);
+                break;
             case "Print":
                 foundCase = true; // Update so we dont continue down the tree
-                
-                // If the first is a quote we know were looking at a charlist
-                if(firstChild.charAt(0) == '\"') {
-                    // Write Contents to Heap
-                    writeToHeap(firstChild);
+                // Create Bytes From FoundTemp Location of First Child
+                String tempByte = getTempAddress(firstChildType, firstChildScope).substring(0, 2);
+                String secondByte = getTempAddress(firstChildType, firstChildScope).substring(2, 4);
 
-                    // Get Hex Heap Pointer
-                    String heapAddress = String.format("%02X", myHeapPointer);
-
-                    // Load register Y with address of Heap pointer
-                    LDYMemory(heapAddress, "00"); // Set 00 Flag to Only Use First Byte
-
-                    // Load register X with 2 to signify there is a string to be read in Y
-                    LDXConst("2");
-                } else {
-                    // Were looking at an id -> get bytes
-                    String firstByte = getTempAddress(firstChild, firstScope).substring(0, 2);
-                    String secondByte = getTempAddress(firstChild, firstScope).substring(2, 4);
-
-                    // Get Type
-                    String type = getStaticType(firstChild, firstScope);
-                    
-                    //Load register Y with contents of print
-                    LDYMemory(firstByte, secondByte);
-
-                    // Check What Value to Load X With
-                    if(type.equalsIgnoreCase("string")) {
-                        LDXConst("2");
-                    } else {
-                        LDXConst("1");
-                    }
-                }
-
-                //SYS Call
-                SYSCall();
-
-            break;
-        }   
-
-        // Recursively call on children if we havent found a case
-        if (!children.isEmpty() && !foundCase) {
-            for (Node child : children) {
-                generateCode(child);
-            }
+                printStatement(firstChildType, firstChildScope, tempByte, secondByte);
+                break;
         }
 
+        // Recursively call on children if we havent found a case
+        goDownTree(children, true, foundCase);
+    }
+
+    // Method For Boolean and Int Assignment 
+    public void boolIntAssignment(ArrayList<Node> children, String firstChildType, int firstChildScope) {
+        // Check if there are more than two children use - ADC
+
+        // Create Bytes From FoundTemp Location of First Child
+        String firstTempByte = getTempAddress(firstChildType, firstChildScope).substring(0, 2);
+        String secondTempByte = getTempAddress(firstChildType, firstChildScope).substring(2, 4);
+        
+        if(children.size() > 2) {
+            handleExprOverload(children, firstChildScope);
+        } else {
+            // If Children count is 2 or less use LDA
+            for(int i = 1; i < children.size(); i++) { // For Each Child Determine Type
+                Node currChild = children.get(i); // Get Curr Child starting at second
+
+                // Depending on found dig or not do the following
+                if(isDigit(currChild.getType())) {
+
+                    // Check if variable has been declared and memory can be optimized
+                    if(tryOptimization(firstTempByte, secondTempByte) == true) {
+                        // move codepointer to override previous declaration
+                        this.myCodePointer -= 5;
+                    }
+
+                    // LDA Const Value
+                    LDAConst("0" +(currChild.getType()));
+
+                    // STA Temporary Location
+                    STAEMemory(firstTempByte, secondTempByte);
+
+                } else {
+                    LDAMemory(currChild, firstTempByte, secondTempByte); // Its an ID
+                }
+            }
+        }
+    }
+
+    // Method For String Assignments
+    public void stringAssignment(String varContents, String firstChildType, int firstChildScope) {
+        // Create Bytes From FoundTemp Location of First Child
+        String firstTempByte = getTempAddress(firstChildType, firstChildScope).substring(0, 2);
+        String secondTempByte = getTempAddress(firstChildType, firstChildScope).substring(2, 4);
+        
+        // if String write to heap -> then store static pointer
+        writeToHeap(varContents); // Writes String to Heap
+        LDAConst(String.valueOf(String.format("%02X", myHeapPointer))); // LDA Heap Pointer
+        STAEMemory(firstTempByte, secondTempByte); // STA Variable for String
+    }
+
+    // Method For Generating Machine Code For While Statements
+    public void whileStatement(ArrayList<Node> children) {
+        // Log Starting Address To Jump Back To
+        int jumpBackTo = this.myCodePointer;
+
+        // Load X Register with First -> Compare X with Second
+        loadCompareX(children); // If Conditions
+
+        // Log Number of Jump Object for BNE
+        int currWhileJump = currJump;
+
+        // Branch DNE
+        BNE(); 
+
+        // Do Loop contents by continuing down
+        goDownTree(children, false, false);
+    
+        // Jump back to the start of the comparison
+        this.myMemory[myCodePointer++] = "D0"; // BNE opcode for unconditional jump
+        int offset = jumpBackTo - (this.myCodePointer - 1);
+        this.myMemory[myCodePointer++] = String.format("%02X", offset & 0xFF); // Wrap to Fit 255
+
+        // Set While Condition Jump To After Block
+        updateJumpAddress(currWhileJump, this.myCodePointer);
+    }
+
+    // Method For Generating Machine Code For If Statements
+    public void ifStatement(ArrayList<Node> children) {
+        // Load first Child into X Register -> Compare Second Child to X
+        loadCompareX(children);
+
+        // Log current Jump Number
+        int currIfJump = currJump;
+
+        // Branch DNE
+        BNE();
+
+        // Recursively call on children
+        goDownTree(children, false, false);
+
+        // Backpatch Jump for Logged Jump Number
+        updateJumpAddress(currIfJump, this.myCodePointer);
+    }
+
+    // Method For Generating Machine Code For Print Statements
+    public void printStatement(String firstChildType, int firstChildScope, String firstTempByte, String secondTempByte) {
+        // If the first has a quote we know were looking at a charlist
+        if(firstChildType.charAt(0) == '\"') {
+            // Write Contents to Heap
+            writeToHeap(firstChildType);
+
+            // Load register Y with address of Heap pointer
+            LDYMemory(String.format("%02X", myHeapPointer), "00"); // Set 00 Flag to Only Use First Byte
+
+            // Load register X with 2 to signify there is a string to be read in Y
+            LDXConst("2");
+        } else {
+            // Were looking at an id -> get bytes
+
+            //Load register Y with contents of print
+            LDYMemory(firstTempByte, secondTempByte);
+
+            // Check What Value to Load X With
+            if(getStaticType(firstChildType, firstChildScope).equalsIgnoreCase("string")) {
+                LDXConst("2");
+            } else {
+                LDXConst("1");
+            }
+        }
+        // Make SYS Call
+        SYSCall();
     }
 
     // Method to Display The Memory
@@ -338,15 +289,22 @@ public class GenerateMachineCode {
         //Instance Variables
         int linecounter = 0;
 
-        // Traverse Memory, printing all and a new line every 8 bytes
-        for(String curr : this.myMemory) {
-            System.out.print(curr + " ");
-            if(linecounter == 8) {
-                System.out.println("");
-                linecounter = 0;
-            } else {
-                linecounter++;
+        // Determine if Machine Code Should Be Displaued
+        if(this.myErrorCount <= 0) {
+            System.out.println("MACHINE CODE SUCCESSFULL GENERATED FOR PROGRAM #" + this.myProgramCounter);
+            // Traverse Memory, printing all and a new line every 8 bytes
+            for(String curr : this.myMemory) {
+                System.out.print(curr + " ");
+                if(linecounter == 8) {
+                    System.out.println("");
+                    linecounter = 0;
+                } else {
+                    linecounter++;
+                }
             }
+        } else {
+            System.out.println("PROGRAM #" + this.myProgramCounter + " MACHINE CODE GENERATION FAILED DUE TO " + this.myErrorCount + " Error(s)");
+            System.out.println("MACHINE CODE WILL NOT BE DISPLAYED...");
         }
     }
 
@@ -365,7 +323,6 @@ public class GenerateMachineCode {
                 }
             }
         }
-
         return tempAddress;
     }
 
@@ -430,6 +387,26 @@ public class GenerateMachineCode {
         return foundDig;
     }
 
+
+    // Method For Traversing AST
+    public void goDownTree(ArrayList<Node> children, boolean useBoolean, boolean boolContents) {
+        // If were using a second condition to determine traversal
+        if(useBoolean) {
+            if (!children.isEmpty() && !boolContents) {
+                for (Node child : children) {
+                    generateCode(child);
+                }
+            }
+        } else {
+            // If were using one condition to determine traversal
+            if (!children.isEmpty()) {
+                for (Node child : children) {
+                    generateCode(child);
+                }
+            }
+        }
+    }
+
     // Method For Optimizing Declaration and Initialization Subsequent Instructions
     public boolean tryOptimization(String firstTempByte, String secondTempByte) {
         boolean result = true; // default true
@@ -478,11 +455,8 @@ public class GenerateMachineCode {
                 // Write to Heap and Load X Register w Location
                 writeToHeap(ifChildren.get(0).getType());
 
-                // Get Hex Heap Pointer
-                String heapAddress = String.format("%02X", myHeapPointer);
-
                 // Load X With Contents of First Child
-                LDXMemory(heapAddress, "00"); // Set 00 Flag to Only Use First Byte
+                LDXMemory(String.format("%02X", myHeapPointer), "00"); // Set 00 Flag to Only Use First Byte
 
                 break;
         }
@@ -506,10 +480,10 @@ public class GenerateMachineCode {
                 LDAConst("0" + ifChildren.get(1).getType());
 
                 // Store Memory Address @ t2
-                STATMemory("0" + ifChildren.get(1).getType(), "00", this.t2);
+                STAEMemory(ifChildren.get(1).getType(), "00");
 
                 //Compare X with Constant -> getting previous two bytes as memory address
-                CPXMemory(this.myMemory[this.t2], this.myMemory[this.t2 + 1]);
+                CPXMemory(this.myMemory[this.myCodePointer - 1], this.myMemory[this.myCodePointer - 2]);
 
                 break;
             case "BOOLOP":
@@ -517,11 +491,8 @@ public class GenerateMachineCode {
                 // Write to Heap and Compare X With Second Child
                 writeToHeap(ifChildren.get(1).getType());
 
-                // Get Hex Heap Pointer
-                String heapAddress = String.format("%02X", myHeapPointer);
-
                 // Compare Contents of X With Second Child
-                CPXMemory(heapAddress, "00"); // Set 00 Flag to Only Use First Byte
+                CPXMemory(String.format("%02X", myHeapPointer), "00"); // Set 00 Flag to Only Use First Byte
                 break;
         }
     }
@@ -571,7 +542,7 @@ public class GenerateMachineCode {
     }
 
     // Method to Write for BNE for If/While Statements
-    public void ifBranchCase() {
+    public void BNE() {
         // Branch on Does Not Equal
         this.myMemory[myCodePointer++] = "D0"; // BNE Op Code
         this.myMemory[myCodePointer++] = "J" + currJump; // Temporary Jump Object
@@ -582,13 +553,11 @@ public class GenerateMachineCode {
 
     // Method to Find and Update Jump Objects
     public void updateJumpAddress(int jumpNumber, int newLocation) {
-        // Get Hex Location Pointer
-        String newAddress = String.format("%02X", newLocation);
-
+  
         // Find Correct Jump Number
         for(JumpObject currObj : this.myJumpTable) {
             if(currObj.getTempAddress().equalsIgnoreCase("J" + jumpNumber)) {
-                currObj.setFinalAddress(newAddress); // Update Its New Final Address
+                currObj.setFinalAddress(String.format("%02X", newLocation)); // Update Its New Final Address
             }
         }
     }
@@ -624,7 +593,6 @@ public class GenerateMachineCode {
     public void backPatchStatic() {
         for(TempObject currObj : this.myStaticTable) {
             String tempAddress = currObj.getTempAddress(); // Get Temp Address of Static Object
-            String newAddress = String.format("%02X", this.myStackPointer); // Get Hex Location Pointer
 
             // Look for matching temp address to replace
             for(int i = 0; i < this.myCodePointer; i++) { // Go Every Two 
@@ -634,7 +602,7 @@ public class GenerateMachineCode {
                 // If we Found The Temp Address
                 if(currBytes.equalsIgnoreCase(tempAddress)) {
                     // Replace the Temp Address with New Address
-                    this.myMemory[i] = newAddress; // Important Byte First
+                    this.myMemory[i] = String.format("%02X", this.myStackPointer); // Important Byte First
                     this.myMemory[i+1] = "00"; // 00
                 }
             }
@@ -689,23 +657,6 @@ public class GenerateMachineCode {
         // Existing Static Entry
         this.myMemory[this.myCodePointer++] = firstByte;
         this.myMemory[this.myCodePointer++] = secondByte;
-        
-    }
-
-    public void STATMemory(String firstByte, String secondByte, int tNumber) {
-        // STA Temporary Location
-        this.myMemory[this.myCodePointer++] = "8D"; // STA
-
-        // Existing Static Entry
-        if(tNumber == 254) {
-            //T2
-            this.myMemory[this.t2] = firstByte;
-            this.myMemory[this.t2 + 1] = secondByte;
-        } else if(tNumber == 242) {
-            //T1
-            this.myMemory[this.t1] = firstByte;
-            this.myMemory[this.t1 + 1] = secondByte;
-        }
         
     }
 

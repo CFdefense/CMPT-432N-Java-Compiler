@@ -68,8 +68,6 @@ public class Semantic {
 
             // Run Code Generator
             this.myCodeGenerator.generateMyMachineCode();
-
-            System.out.println("DEBUG");
         }
     }
 

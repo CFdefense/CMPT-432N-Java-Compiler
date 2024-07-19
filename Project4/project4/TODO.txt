@@ -30,9 +30,8 @@ TableForJumps
 
 
 TODO
-Heap OVERFLOW
-Stack OVERFLOW
+single print
 Multi While
-Printing "" Empty Strings
 Expr overload remove 69 op code
 Expr overload in if/while
+Implement Bytes Used

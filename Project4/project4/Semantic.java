@@ -350,9 +350,8 @@ public class Semantic {
                 }
 
                 // Check to see if all are of the same type
-                String firstType = printTypes.get(0);
                 for(String prints : printTypes) {
-                    if(!prints.equalsIgnoreCase(firstType)) {
+                    if(!prints.equalsIgnoreCase(printTypes.get(0))) {
                         printResult = false;
                         misMatched.add(prints);
                     }
@@ -365,7 +364,7 @@ public class Semantic {
 
                 // Display results
                 if(!printResult) {
-                    System.out.println("ERROR: TYPE MISMTACH IN PRINT STATEMENT - Expected [ " + firstType + " ] but found [ " + resultstring + " ]");
+                    System.out.println("ERROR: TYPE MISMTACH IN PRINT STATEMENT - Expected [ " + printTypes.get(0) + " ] but found [ " + resultstring + " ]");
                     this.errorCount++;
                 }
         }       

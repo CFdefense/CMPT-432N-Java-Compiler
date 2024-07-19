@@ -125,7 +125,7 @@ public class GenerateMachineCode {
     // Recursive Method For Generating Machine Code
     public void generateCode(Node currNode) {
         // Immediately Leave if No Children
-        if(currNode.getChildren().size() == 0) {
+        if(currNode.getChildren().size() == 0 ) {
             return;
         }
         // Instance Variables
@@ -667,11 +667,23 @@ public class GenerateMachineCode {
 
     // Method to Write a String to the Heap
     public void writeToHeap(String value) {
-        this.myMemory[--myHeapPointer] = "00"; // Write 00 next up to seperate Strings
+        boolean heapOverFlow = false; // heap overflow flag
 
         // Add each Characters Ascii Hex To The Heap
         for(int i = value.length() - 2; i > 0; i--) { // skip first and last cause ""
-            this.myMemory[--myHeapPointer] = Integer.toHexString(value.charAt(i)).toUpperCase();
+            if(this.myHeapPointer <= this.myCodePointer) {
+                if(!heapOverFlow) {
+                    System.out.println("ERROR - HEAP OVERFLOW"); // print error once
+                    this.myErrorCount++; // increment error count once
+                }
+                heapOverFlow = true; // update error flag
+            } else {
+                if(i == value.length() - 2) {// ie first value 
+                    this.myMemory[--myHeapPointer] = "00"; // Write 00 next up to seperate Strings
+                }
+                this.myMemory[--myHeapPointer] = Integer.toHexString(value.charAt(i)).toUpperCase();
+            }
+            
         }
     }
 
@@ -693,23 +705,30 @@ public class GenerateMachineCode {
 
     // Method for Back Patching Updated Addresses for Static Table Objects
     public void backPatchStatic() {
-        for(TempObject currObj : this.myStaticTable) {
-            String tempAddress = currObj.getTempAddress(); // Get Temp Address of Static Object
-
-            // Look for matching temp address to replace
-            for(int i = 0; i < this.myCodePointer; i++) { // Go Every Two 
-                // Two Byte String to Be Compared
-                String currBytes = this.myMemory[i] + this.myMemory[i+1];
-
-                // If we Found The Temp Address
-                if(currBytes.equalsIgnoreCase(tempAddress)) {
-                    // Replace the Temp Address with New Address
-                    this.myMemory[i] = String.format("%02X", this.myStackPointer); // Important Byte First
-                    this.myMemory[i+1] = "00"; // 00
+        // Check For Stack Overflow -> Enough Space
+        if(this.myStackPointer > this.myHeapPointer - this.myStaticTable.size()) {
+            System.out.println("ERROR - STACK OVERFLOW");
+            this.myErrorCount++; // increment error count
+        } else {
+            for(TempObject currObj : this.myStaticTable) {
+                String tempAddress = currObj.getTempAddress(); // Get Temp Address of Static Object
+    
+                // Look for matching temp address to replace
+                for(int i = 0; i < this.myCodePointer; i++) { // Go Every Two 
+                    // Two Byte String to Be Compared
+                    String currBytes = this.myMemory[i] + this.myMemory[i+1];
+    
+                    // If we Found The Temp Address
+                    if(currBytes.equalsIgnoreCase(tempAddress)) {
+                        // Replace the Temp Address with New Address
+                        this.myMemory[i] = String.format("%02X", this.myStackPointer); // Important Byte First
+                        this.myMemory[i+1] = "00"; // 00
+                    }
                 }
+                this.myStackPointer++; // get next address
             }
-            this.myStackPointer++; // get next address
         }
+        
     }
 
     // Method to Fill Empty Bytes with Zeros

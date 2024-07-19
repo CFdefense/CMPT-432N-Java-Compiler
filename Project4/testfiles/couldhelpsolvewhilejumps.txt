@@ -1,0 +1,10 @@
+/*  While false and boolean expresion output: ended*/
+{
+boolean x
+x = true
+while (x == true) {
+    print(x)
+    x = false
+}
+print("ended")
+}$

@@ -175,10 +175,16 @@ public class GenerateMachineCode {
             case "Print":
                 foundCase = true; // Update so we dont continue down the tree
                 // Create Bytes From FoundTemp Location of First Child
-                String tempByte = getTempAddress(firstChildType, firstChildScope).substring(0, 2);
-                String secondByte = getTempAddress(firstChildType, firstChildScope).substring(2, 4);
-
-                printStatement(firstChildType, firstChildScope, tempByte, secondByte);
+                if(firstChildType.charAt(0) != '\"') {
+                    String tempByte = getTempAddress(firstChildType, firstChildScope).substring(0, 2);
+                    String secondByte = getTempAddress(firstChildType, firstChildScope).substring(2, 4);
+    
+                    printStatement(firstChildType, firstChildScope, tempByte, secondByte);
+                } else {
+                    // Quotes Case 
+                    printStatement(firstChildType, 0, "00", "00");
+                }
+                
                 break;
         }
 
@@ -759,7 +765,7 @@ public class GenerateMachineCode {
     // Method to Add a Constant From Memory 
     public void ADCConst(String value) {
         this.myMemory[this.myCodePointer++] = "69"; // ADC Op Code -> Not in Instruction set but needed?
-        this.myMemory[this.myCodePointer++] = value; // Value to add
+        this.myMemory[this.myCodePointer++] = value + "0"; // Value to add
     }
     
     // Method to Add with Carry from Memory

@@ -60,6 +60,7 @@ public class Semantic {
             // Display Table
             displaySymbolTable();
 
+
             // Load AST Into Code Generator
             this.myCodeGenerator.setAST(myAST);
 
@@ -68,6 +69,9 @@ public class Semantic {
 
             // Run Code Generator
             this.myCodeGenerator.generateMyMachineCode();
+
+            // Clear For Next Pass
+            this.myCodeGenerator.clear();
         }
     }
 
@@ -121,6 +125,9 @@ public class Semantic {
 
                     // Update the scope for the current node
                     currNode.setScope(currScope);
+
+                    // Update the scope for the symbol node
+                    this.mySymbolTable.search(currVarDecl.get(1).getType()).setScope(currScope);
                 } else {
                     // Throw error
                     System.out.println("ERROR: VARIABLE REDECLARED - [ " + currVarDecl.get(1).getType() + " ]");
@@ -448,6 +455,7 @@ public class Semantic {
     public void displaySymbolTable() {
         System.out.println("Displaying Program # " + this.myProgramNumber + " Symbol Table...");
         this.mySymbolTable.displayTree(this.mySymbolTable.getRoot());
+        System.out.println("--------------------------------------");
     }
 
     // Method to Determine Unused Variables Following Semantic Analysis

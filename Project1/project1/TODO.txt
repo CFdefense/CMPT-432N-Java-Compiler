@@ -14,3 +14,4 @@ TO RUN -> Paste entire path of test
 
 --MISSING--
 Some Line/Program Counting
+ISSUE WITH EOP DISCOVERED CHECK TODO Project 4

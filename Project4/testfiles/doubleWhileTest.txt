@@ -1,11 +1,11 @@
 {
     int a
     a = 1
-    int b
-    b = 1
     while (a != 3) {
         a = 1 + a
         print(a)
+        int b
+        b = 1
         while(b != 3) {
             b = 1 + b
             print(b)
@@ -13,7 +13,3 @@
     }
 }
 $
-
-75 00 = a
-76 00 = b
-maybe branch to A9 01 A2 00 w first D0

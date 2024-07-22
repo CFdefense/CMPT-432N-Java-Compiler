@@ -1,4 +1,6 @@
 {
-    print("hello")
+    string a
+    a = "hello"
+    print(a)
 }
 $

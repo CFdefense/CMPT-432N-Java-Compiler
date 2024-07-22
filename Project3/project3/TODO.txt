@@ -21,9 +21,4 @@ Warnings -> variables declarded/declared and initialized but unused, used variab
 
 
 --TODO--
-
-Continue Work for Semantics
-1. display print hashtable -> Done -> test a little
-2. Do Warnings implementation -> Done
-3. Work on conclusions of semantic -> Done
-4. Next Steps CONTINUE OR NO?? ERRORS? -> Done
+EXPR boolop EXPR integration use intop?

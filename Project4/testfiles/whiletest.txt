@@ -1,9 +1,0 @@
-{
-    int b
-    b = 2
-    while(b != 3) {
-        print(b)
-        b = 1 + b
-    }
-}
-$

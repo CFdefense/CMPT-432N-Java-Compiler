@@ -268,10 +268,13 @@ public class Lexer {
                     // A Char must be in quotes because we already checked IDs
                     tokenID = "T_CHAR";
                     
-                    // create token
-                    Token newCharToken = new Token(tokenID, myMatch, lineNumber + 1);
-                    myTokens.add(newCharToken);
-                    System.out.println("LEXER --> | " + tokenID + " [ " + myMatch + " ] on line " + (lineNumber) + "...");
+                    // create token for each letter -> good for "string etc"
+                    for(int i = 0; i < myMatch.length(); i++) {
+                        Token newCharToken = new Token(tokenID, String.valueOf(myMatch.charAt(i)), lineNumber + 1);
+                        myTokens.add(newCharToken);
+                        System.out.println("LEXER --> | " + tokenID + " [ " + String.valueOf(myMatch.charAt(i)) + " ] on line " + (lineNumber) + "...");
+                    }
+                    
                 }
 
                 // The Match is a WHITESPACE
@@ -364,15 +367,13 @@ public class Lexer {
 
             // Reset Lexer for Next Program
             this.clearLexer();
-
-        }
-        
+        } 
     }
 
     // Output error for no EOP detected
     if(lastMatch.compareTo("$") != 0) {
         // Program ended without reaching $
-        System.out.println("ERROR NO EOP DETECTED AT END OF FILE '$'");
+        System.out.println("ERROR NO EOP DETECTED AT END OF FILE '$' OR EXTRA CHARACTER(S) EXISTING AFTER EOP");
         this.errorCount++;
 
         // check for more warnings and output error count

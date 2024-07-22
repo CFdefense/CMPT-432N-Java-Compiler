@@ -1,7 +1,19 @@
 {
-boolean a
-a = true
+    int i
+    i = 5
+    print(i)
+}
+$
+{
+int a
+a = 3
+int b
+b = 4
+a = b
 print(a)
+if (a == b) {
+    print(a)
+}
 }
 $
 {

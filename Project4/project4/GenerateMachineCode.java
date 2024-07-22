@@ -28,7 +28,9 @@ public class GenerateMachineCode {
     private int[] gramDigit; // to store acceptable digits
     private String truePointer; // Hex Pointer to 'true'
     private String falsePointer; // Hex Pointer to 'false'
-    private String endPointer; // Hex Pointer to last byte for use
+    private String t2Pointer; // Hex Pointer to last byte for use
+    private String t1Pointer; // Hex Pointer for second to last byte for Use
+    private boolean myHeapOverflow; // Keep track of Heap Overflow 
 
     // Null Constructor
     public GenerateMachineCode() {
@@ -37,35 +39,43 @@ public class GenerateMachineCode {
         this.myJumpTable = new ArrayList<>(); // Initialize ArrayList
         this.myCodePointer = 0; // Code Pointer Starts at Beginning
         this.myStackPointer = 0; // To Start After Code Pointer
-        this.myHeapPointer = myMaxSize - 12; // Heap Pointer Starts at End
+        this.myHeapPointer = myMaxSize - 13; // Heap Pointer Starts at End
         this.myAST = null; // To be Loaded in
         this.myProgramCounter = 0; // To be Updated
         this.myErrorCount = 0; // Initialize to 0
         this.currTemp = 0; // Initialize to 0 - start T0XX
         this.gramDigit = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}; // Acceptable Digits
         this.currJump = 0; // Current Jump Object
+        this.myHeapOverflow = false;
 
+        initMemory();
+    }  
+    
+    // Initialize Memory Spots
+    public void initMemory() {
         // Initialize true and false
-        this.myMemory[254] = "00";
-        this.myMemory[253] = "65"; // e
-        this.myMemory[252] = "75"; // u
-        this.myMemory[251] = "72"; // r
-        this.myMemory[250] = "74"; // t
-        this.myMemory[249] = "00"; // divider
-        this.myMemory[248] = "65"; // e
-        this.myMemory[247] = "73"; // s
-        this.myMemory[246] = "6C"; // l
-        this.myMemory[245] = "61"; // a
-        this.myMemory[244] = "66"; // f
+        this.myMemory[253] = "00";
+        this.myMemory[252] = "65"; // e
+        this.myMemory[251] = "75"; // u
+        this.myMemory[250] = "72"; // r
+        this.myMemory[249] = "74"; // t
+        this.myMemory[248] = "00"; // divider
+        this.myMemory[247] = "65"; // e
+        this.myMemory[246] = "73"; // s
+        this.myMemory[245] = "6C"; // l
+        this.myMemory[244] = "61"; // a
+        this.myMemory[243] = "66"; // f
 
         // Initialize true and false pointers
-        this.truePointer = String.valueOf(String.format("%02X", 250));
-        this.falsePointer = String.valueOf(String.format("%02X", 244));
+        this.truePointer = String.valueOf(String.format("%02X", 249));
+        this.falsePointer = String.valueOf(String.format("%02X", 243));
 
-        // Initialize end pointer
-        this.endPointer = String.valueOf(String.format("%02X", 255));
-        this.myMemory[255] = "00"; // initialize to 00
-    }  
+        // Initialize t2 and t1 pointers
+        this.t2Pointer = String.valueOf(String.format("%02X", 255));
+        this.t1Pointer = String.valueOf(String.format("%02X", 254));
+        this.myMemory[254] = "00"; // initialize t2 to 00
+        this.myMemory[255] = "00"; // initialize t1 to 00
+    }
     
     // Setter Methods
     public void setAST(AST newAST) {
@@ -83,12 +93,14 @@ public class GenerateMachineCode {
         this.myJumpTable.clear();
         this.myCodePointer = 0;
         this.myStackPointer = 0;
-        this.myHeapPointer = myMaxSize;
+        this.myHeapPointer = myMaxSize - 13;
         this.myAST = null;
         this.myProgramCounter = 0;
         this.myErrorCount = 0;
         this.currJump = 0;
         this.currTemp = 0;
+        this.myHeapOverflow = false;
+        initMemory();
     } 
 
     //! End of Machine Code Generator Construction
@@ -99,7 +111,7 @@ public class GenerateMachineCode {
     // Method For Controlling all Steps of Code Generation
     public void generateMyMachineCode() {
         // Starting Machine Code Generator
-        System.out.println("GENERATING MACHINE CODE FOR PROGRAM #" + this.myProgramCounter);
+        System.out.println("\nGENERATING MACHINE CODE FOR PROGRAM # " + this.myProgramCounter + "...");
 
         // Generate Code By Recursively Analyzing The AST
         generateCode(this.myAST.getRoot());
@@ -119,7 +131,11 @@ public class GenerateMachineCode {
         // Fill Zeros
         fillZeros();
 
+        // Display Memory
         displayMachineCode();
+
+        // Calculate and Display TBU
+        displayBytesUsed();
     }
 
     // Recursive Method For Generating Machine Code
@@ -135,9 +151,6 @@ public class GenerateMachineCode {
         String firstChildType = children.get(0).getType(); // First Child Type
         int firstChildScope = children.get(0).getScope(); // First Child Scope
         String firstType = getStaticType(firstChildType, firstChildScope); // Type of First Child
-
-        // Debug
-        System.out.println("Curr Node: " + currType);
 
         // Generate Machine Code Per Situation
         switch(currType) {
@@ -224,7 +237,7 @@ public class GenerateMachineCode {
                     // Bool Op False -> LDA with 00
                     LDAConst(this.falsePointer);
                 } else {
-                    LDAMemory(currChild, firstTempByte, secondTempByte); // Its an ID
+                    LDAMemory(currChild, firstTempByte, secondTempByte, false); // Its an ID
                 }
                 // STA Temporary Location
                 STAEMemory(firstTempByte, secondTempByte);
@@ -239,7 +252,14 @@ public class GenerateMachineCode {
         String secondTempByte = getTempAddress(firstChildType, firstChildScope).substring(2, 4);
         
         // if String write to heap -> then store static pointer
-        writeToHeap(varContents); // Writes String to Heap
+        boolean result = writeToHeap(varContents); // Writes String to Heap
+
+        // Upd heapOverFlow
+        if(result == true && this.myHeapOverflow == false) {
+            System.out.println("ERROR - HEAP OVERFLOW"); // print error once
+            this.myErrorCount++; // increment error count once
+            this.myHeapOverflow = true;
+        }
         LDAConst(String.valueOf(String.format("%02X", myHeapPointer))); // LDA Heap Pointer
         STAEMemory(firstTempByte, secondTempByte); // STA Variable for String
     }
@@ -256,29 +276,62 @@ public class GenerateMachineCode {
         // Load X Register with First -> Compare X with Second
         loadCompareX(children); // If Conditions
 
-        // If Were looking at a != Comparison 
+        // Update currJumpOne
+        int currJumpOne = this.currJump;
+
+        int startingPosOne = this.myCodePointer;
+
+        // Branch DNE to Next Jump
+        BNE("");
+
+        // Update Accumulator
         if(comparisonType.equalsIgnoreCase("isNotEq")) {
-            // Reset Accumulator
             LDAConst("00");
+        } else {
+            LDAConst("01"); 
+        }
+        
+        // Store Accumulator at FF 00
+        STAEMemory(t2Pointer, "00");
 
-            // Branch DNE 02?
-            BNE("02");
-
-            // LDA Accumulator 01
-            LDAConst("01");
-
-            // Reset X Register
+        // Set X Register 
+        if(comparisonType.equalsIgnoreCase("isNotEq")) {
+            LDXConst("1");
+        } else {
             LDXConst("0");
+        }
+        
+        // Compare X register and End Pointr
+        CPXMemory("00", "00", true);
 
-            // Store Accumulator at End Pointer
-            STAEMemory(endPointer, "00");
-
-            // Compare X register and End Pointr
-            CPXMemory("00", "00", true);
+        // Update Previous Jump to Jump here
+        if(comparisonType.equalsIgnoreCase("isNotEq")) {
+            updateJumpAddress(currJumpOne, this.myCodePointer - startingPosOne);
         }
 
+        // Branch DNE 
+        BNE("05");
+
+        // Update Accumulator
+        if(comparisonType.equalsIgnoreCase("isNotEq")) {
+            LDAConst("01");
+        } else {
+            LDAConst("00"); 
+        }
+
+        // Store at end pointer
+        STAEMemory(t2Pointer, "00");
+
+        // Set X Register
+        LDXConst("1");
+
+        // Compare X With End Pointer
+        CPXMemory("00", "00", true);
+
         // Log Number of Jump Object for BNE
-        int currWhileJump = currJump;
+        int currJumpTwo = currJump;
+
+        int startingPosTwo = this.myCodePointer;
 
         // Branch DNE To Post Branch 
         BNE(""); 
@@ -287,19 +340,22 @@ public class GenerateMachineCode {
         goDownTree(children, false, false);
     
         // Set While Condition Jump To After Block
-        updateJumpAddress(currWhileJump, this.myCodePointer);
+        updateJumpAddress(currJumpTwo, this.myCodePointer);
 
         // Reset Accumulator
         LDAConst("00");
 
         // Store Accumulator at End Pointer
-        STAEMemory(endPointer, "00");
+        STAEMemory(t2Pointer, "00");
 
         // LDX With 1
         LDXConst("1");
 
         // Compare X With End Pointer
         CPXMemory("00", "00", true);
+
+        //Update Previous Jump marker
+        updateJumpAddress(currJumpTwo, this.myCodePointer - startingPosTwo);
 
         // Jump back to the start of the comparison
         this.myMemory[myCodePointer++] = "D0"; // BNE opcode for unconditional jump
@@ -331,7 +387,7 @@ public class GenerateMachineCode {
             LDXConst("0");
 
             // Store Accumulator at End Pointer
-            STAEMemory(endPointer, "00");
+            STAEMemory(t2Pointer, "00");
 
             // Compare X register and End Pointr
             CPXMemory("00", "00", true);
@@ -358,13 +414,21 @@ public class GenerateMachineCode {
         // If the first has a quote we know were looking at a charlist
         if(firstChildType.charAt(0) == '\"') {
             // Write Contents to Heap
-            writeToHeap(firstChildType);
+            boolean result = writeToHeap(firstChildType);
 
-            // Load register Y with address of Heap pointer
-            LDYMemory(String.format("%02X", myHeapPointer), "00"); // Set 00 Flag to Only Use First Byte
+            // Upd heapOverFlow
+            if(result == true && this.myHeapOverflow == false) {
+                System.out.println("ERROR - HEAP OVERFLOW"); // print error once
+                this.myErrorCount++; // increment error count once
+                this.myHeapOverflow = true;
+            }
 
             // Load register X with 2 to signify there is a string to be read in Y
             LDXConst("2");
+
+            // Load register Y with address of Heap pointer
+            LDYConst(String.format("%02X", myHeapPointer));
+
         } else {
             // Were looking at an id -> get bytes
 
@@ -389,7 +453,8 @@ public class GenerateMachineCode {
 
         // Determine if Machine Code Should Be Displaued
         if(this.myErrorCount <= 0) {
-            System.out.println("MACHINE CODE SUCCESSFULL GENERATED FOR PROGRAM #" + this.myProgramCounter);
+            System.out.println("\nMACHINE CODE SUCCESSFULL GENERATED FOR PROGRAM # " + this.myProgramCounter);
+            System.out.println("\nDISPLAYING 6502 MICROPROCESSOR MACHINE CODE FOR PROGRAM # " + this.myProgramCounter + "...");
             // Traverse Memory, printing all and a new line every 8 bytes
             for(String curr : this.myMemory) {
                 System.out.print(curr + " ");
@@ -485,6 +550,14 @@ public class GenerateMachineCode {
         return foundDig;
     }
 
+    // Output Total Byte Space Used
+    public void displayBytesUsed() {
+        // TBU = MyCodePointer + StaticSize + heapsize
+        int bytesUsed = myCodePointer + this.myStaticTable.size() + (255 - myHeapPointer);
+
+        // Display TBU
+        System.out.println("\nTotal Bytes Used - " + bytesUsed + "/256"); 
+    }
 
     // Method For Traversing AST
     public void goDownTree(ArrayList<Node> children, boolean useBoolean, boolean boolContents) {
@@ -551,7 +624,14 @@ public class GenerateMachineCode {
             case "BOOLVAL":
             case "STRING":
                 // Write to Heap and Load X Register w Location
-                writeToHeap(ifChildren.get(0).getType());
+                boolean result = writeToHeap(ifChildren.get(0).getType());
+
+                // Upd heapOverFlow
+                if(result == true && this.myHeapOverflow == false) {
+                    System.out.println("ERROR - HEAP OVERFLOW"); // print error once
+                    this.myErrorCount++; // increment error count once
+                    this.myHeapOverflow = true;
+                }
 
                 // Load X With Contents of First Child
                 LDXMemory(String.format("%02X", myHeapPointer), "00"); // Set 00 Flag to Only Use First Byte
@@ -578,17 +658,23 @@ public class GenerateMachineCode {
                 LDAConst("0" + ifChildren.get(1).getType());
 
                 // Store Memory Address
-                STAEMemory(this.endPointer, "00");
+                STAEMemory(this.t1Pointer, "00");
 
                 //Compare X with Constant -> getting previous two bytes as memory address
-                CPXMemory(this.myMemory[this.myCodePointer - 1], this.myMemory[this.myCodePointer - 2], true);
+                CPXMemory(this.myMemory[this.myCodePointer - 1], this.myMemory[this.myCodePointer - 2], false);
 
                 break;
             case "BOOLOP":
             case "STRING":
                 // Write to Heap and Compare X With Second Child
-                writeToHeap(ifChildren.get(1).getType());
+                boolean result = writeToHeap(ifChildren.get(1).getType());
 
+                // Upd heapOverFlow
+                if(result == true && this.myHeapOverflow == false) {
+                    System.out.println("ERROR - HEAP OVERFLOW"); // print error once
+                    this.myErrorCount++; // increment error count once
+                    this.myHeapOverflow = true;
+                }
                 // Compare Contents of X With Second Child
                 CPXMemory(String.format("%02X", myHeapPointer), "00", false); // Set 00 Flag to Only Use First Byte
                 break;
@@ -598,46 +684,44 @@ public class GenerateMachineCode {
     // Method to handle Expr Overload ie assignments such as a = 1 + 2 + a
     public void handleExprOverload(ArrayList<Node> children, int varScope) {
         // Instance Variables
-        boolean isFirstAddition = true; // Flag First Var For Indicating LDA
-        String varName = children.get(0).getType(); // Get First Child Name
-        String varTempAddress = getTempAddress(varName, varScope); // Search First Child Address
-        String firstByte = varTempAddress.substring(0, 2); // First Byte
-        String secondByte = varTempAddress.substring(2, 4); // Second Byte
+        Node lastChild = children.get(children.size() - 1);
+        String lastChildType = getNodeType(lastChild);
+        String lastChildAddress = getTempAddress(lastChild.getType(), varScope);
+        Node firstChild = children.get(0);
+        String firstChildAddress = getTempAddress(firstChild.getType(), varScope);
 
-        // For each Child
-        for (int i = 1; i < children.size(); i++) {
-            Node currChild = children.get(i); // Child Node
-            boolean isDigit = isDigit(currChild.getType()); // Determine if the Child is a digit
+        // Determine Last Child and Store in t2
+        if(lastChildType.equalsIgnoreCase("ID")) {
+            LDAMemory(lastChild, t2Pointer, "00", false);
+        } else { // Digit Case
+            // Load Accumulator With Value
+            LDAConst("0" + lastChild.getType());
 
-            // IF were a digit Load Const into Accumulator, or ADC if not first addition
-            if (isDigit) {
-                if (isFirstAddition) {
-                    LDAConst("0" + currChild.getType());
-                    isFirstAddition = false;
-                } else {
-                    ADCConst(currChild.getType()); // UPD
+            // Store at T2
+            STAEMemory(t2Pointer, "00");
+        }
+        
+        // for each child before last child
+        for(Node child : children) {
+            // Skip Last Child and First Child
+            if(child != firstChild && child != lastChild) { 
+                if(getNodeType(child).equalsIgnoreCase("ID")) { // ID Case
+                    LDAMemory(child, lastChildAddress.substring(0,2), lastChildAddress.substring(2,4), true);
+                } else { // Digit Case
+                    // Load Accumulator With Value
+                    LDAConst("0" + child.getType());
                 }
-            } else {
-                // If were a location Load Memory into Accumulator, or ADC if not first addition
-                if (isFirstAddition) {
-                    LDAMemory(currChild, firstByte, secondByte);
-                    isFirstAddition = false;
-                } else {
-                    ADCMemory(currChild, firstByte, secondByte);
-                }
+                // Add With Carry T2
+                ADCMemory(t2Pointer, "00");
+
+                // Store Accumulator in T2
+                STAEMemory(t2Pointer, "00");
             }
         }
-
-        // Store the result back to the variable
-        String varAddress = getTempAddress(varName, varScope);
-
-        // Split Var Address into Bytes
-        String varFirstByte = varAddress.substring(0, 2);
-        String varSecondByte = varAddress.substring(2, 4);
-
-        // Store the Accumulator into Memory
-        STAEMemory(varFirstByte, varSecondByte);
+        // Store in first child location
+        STAEMemory(firstChildAddress.substring(0, 2), firstChildAddress.substring(2, 4));
     }
+        
 
     // Method to Write for BNE for If/While Statements
     public void BNE(String location) {
@@ -666,16 +750,12 @@ public class GenerateMachineCode {
     }
 
     // Method to Write a String to the Heap
-    public void writeToHeap(String value) {
+    public boolean writeToHeap(String value) {
         boolean heapOverFlow = false; // heap overflow flag
 
         // Add each Characters Ascii Hex To The Heap
         for(int i = value.length() - 2; i > 0; i--) { // skip first and last cause ""
             if(this.myHeapPointer <= this.myCodePointer) {
-                if(!heapOverFlow) {
-                    System.out.println("ERROR - HEAP OVERFLOW"); // print error once
-                    this.myErrorCount++; // increment error count once
-                }
                 heapOverFlow = true; // update error flag
             } else {
                 if(i == value.length() - 2) {// ie first value 
@@ -685,6 +765,7 @@ public class GenerateMachineCode {
             }
             
         }
+        return heapOverFlow;
     }
 
     // Method to Backpatch Code With Final Jump Addresses
@@ -780,22 +861,16 @@ public class GenerateMachineCode {
         this.myMemory[this.myCodePointer++] = secondByte;
         
     }
-
-    // Method to Add a Constant From Memory 
-    public void ADCConst(String value) {
-        this.myMemory[this.myCodePointer++] = "69"; // ADC Op Code -> Not in Instruction set but needed?
-        this.myMemory[this.myCodePointer++] = value + "0"; // Value to add
-    }
     
     // Method to Add with Carry from Memory
-    public void ADCMemory(Node currChild, String firstByte, String secondByte) {
+    public void ADCMemory(String firstByte, String secondByte) {
         this.myMemory[this.myCodePointer++] = "6D"; // ADC Op Code
         this.myMemory[this.myCodePointer++] = firstByte;
         this.myMemory[this.myCodePointer++] = secondByte;
     }
 
     // Method to Load Accumulator with a Memory Address
-    public void LDAMemory(Node currChild, String firstTempByte, String secondTempByte) {
+    public void LDAMemory(Node currChild, String firstTempByte, String secondTempByte, boolean isADC) {
         this.myMemory[this.myCodePointer++] = "AD"; // LDA Memory
 
         // Find Temporary Memory of the ID
@@ -810,11 +885,19 @@ public class GenerateMachineCode {
         this.myMemory[this.myCodePointer++] = secondByte;
 
         //STA Temporary Location
-        this.myMemory[this.myCodePointer++] = "8D"; // STA 
+        if(!isADC) {
+            this.myMemory[this.myCodePointer++] = "8D"; // STA 
 
-        // STA Memory Location
-        this.myMemory[this.myCodePointer++] = firstTempByte;
-        this.myMemory[this.myCodePointer++] = secondTempByte;
+            // STA Memory Location
+            this.myMemory[this.myCodePointer++] = firstTempByte;
+            this.myMemory[this.myCodePointer++] = secondTempByte;
+        }
+    }
+
+    // Method to load the Y register with a const
+    public void LDYConst(String firstByte) {
+        this.myMemory[this.myCodePointer++] = "A0"; // LDY Op code
+        this.myMemory[this.myCodePointer++] = firstByte; // Important Byte
     }
 
     // Method to Load the Y Register With a Memory Address
@@ -837,7 +920,6 @@ public class GenerateMachineCode {
 
         this.myMemory[this.myCodePointer++] = "0" + value; // Value to be loaded
     }
-
     // Method to Load the X Register With a Memory Address
     public void LDXMemory(String firstByte, String secondByte) {
         this.myMemory[this.myCodePointer++] = "AE"; // LDX Op code
@@ -856,7 +938,7 @@ public class GenerateMachineCode {
     public void CPXMemory(String firstByte, String secondByte, boolean isEnd) {
         this.myMemory[this.myCodePointer++] = "EC"; // CPX Op code
         if(isEnd) {
-            this.myMemory[this.myCodePointer++] = this.endPointer;
+            this.myMemory[this.myCodePointer++] = this.t2Pointer;
             this.myMemory[this.myCodePointer++] = "00";
         } else {
             // Check if were using Temp Memory Address
@@ -865,7 +947,8 @@ public class GenerateMachineCode {
                 this.myMemory[this.myCodePointer++] = secondByte;
             } else {
                 // Heap Memory Address
-                this.myMemory[this.myCodePointer++] = firstByte;
+                this.myMemory[this.myCodePointer++] = secondByte;
+                this.myMemory[this.myCodePointer++] = "00";
             }
         }
     }

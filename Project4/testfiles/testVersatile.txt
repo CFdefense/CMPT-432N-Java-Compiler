@@ -1,0 +1,6 @@
+{
+    boolean a
+    a = false
+    print(a)
+}
+$

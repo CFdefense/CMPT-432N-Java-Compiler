@@ -30,8 +30,5 @@ TableForJumps
 
 
 TODO
-single print
-Multi While
-Expr overload remove 69 op code
-Expr overload in if/while
-Implement Bytes Used
+Expr overload in if/while -> NOT IMPLEMENTED SEE testExprIF.txt
+Lexer Problem with spaces existing after $ EOP

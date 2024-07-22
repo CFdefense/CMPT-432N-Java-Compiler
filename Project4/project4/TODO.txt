@@ -29,6 +29,10 @@ TableForJumps
 --> Heap Stored Down -> Up
 
 
-TODO
-Expr overload in if/while -> NOT IMPLEMENTED SEE testExprIF.txt
+TODO FUTURE
+Expr overload in if/while -> NOT IMPLEMENTED SEE testExprIF.txt -> Most important TODO
 Lexer Problem with spaces existing after $ EOP
+While(true/false)
+if(true/false)
+(()) Double parenthesis comparisons/advanced 
+string concatenation

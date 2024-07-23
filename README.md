@@ -1,4 +1,6 @@
 # Marist College 'Design of Compilers' Class by Professor Labouseur
+
+## Created a 6502 Microprocessor Compiler Which Translates High-Level Code into Executable 6502 Microprocessor Machine Code
 ## Self-Taught and COMPLETED 7/22/2024
 
 ### IMPORTANT: To Execute Compiler Simply Run Any Project's Main File and Copy a Test File's Complete Path Into The Console
@@ -12,4 +14,4 @@
 ## LaTeX Writeups and Some Code Adjustments May be Required
 
 
-#### Class Materials found here: https://www.labouseur.com/courses/compilers/
+#### Class Materials Found Here: https://www.labouseur.com/courses/compilers/

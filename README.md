@@ -3,7 +3,7 @@
 <h3 align="center">6502 Microprocessor Compiler That Translates High-Level Code into Executable 6502 Microprocessor Machine Code</h3>  
 <br />
  <p align="center">
-    project_description
+    About The Project
     <br />
     <a href="https://www.labouseur.com/courses/compilers/"><strong>Class Information »</strong></a>
     <br />

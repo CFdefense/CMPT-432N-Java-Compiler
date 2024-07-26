@@ -11,7 +11,7 @@
   </p>
   <h3 align="center">Project Overview and Limitations</h3> 
   <p align="center">
-  Due to the complexity of a Compiler and the vast amount of differing ways in which we can write high-level language, it becomes necessary for the sake of realistic expectations to set limitations on ourselves for this project. These limitations will help us create an intuitive compiler that will be both amazing and practical in the sense that it can be reasonable created in a few months time. As such to create this perfect balance, Professor Labouseur restricted the acceptable high-level grammar that this compiler will allow for use. <a href="https://www.labouseur.com/courses/compilers/grammar.pdf"><Our Grammer></strong></a>
+  Due to the complexity of a Compiler and the vast amount of differing ways in which we can write high-level language, it becomes necessary for the sake of realistic expectations to set limitations on ourselves for this project. These limitations will help us create an intuitive compiler that will be both amazing and practical in the sense that it can be reasonable created in a few months time. As such to create this perfect balance, Professor Labouseur restricted the acceptable high-level grammar that this compiler will allow for use. <a href="https://www.labouseur.com/courses/compilers/grammar.pdf"><strong>See Acceptable Grammer Here></strong></a>
 
   <h4 align="center">Project One: Lexical Analysis</h4> 
   <p align="center">

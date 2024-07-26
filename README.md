@@ -13,7 +13,7 @@
   <p align="center">
   The Project Is Broken Down Into The Following 4 Sub-Projects...
 
-  ### Project One: Lexical Analysis
+  <h4 align="center">"Project One: Lexical Analysis"</h4> 
 
   ### Project Two: Parsing
 

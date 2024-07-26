@@ -1,6 +1,16 @@
 <h3 align="center">Marist College 'Design of Compilers' Class by Professor Labouseur</h3> 
 
 <h3 align="center">6502 Microprocessor Compiler That Translates High-Level Code into Executable 6502 Microprocessor Machine Code</h3>  
+<br />
+ <p align="center">
+    project_description
+    <br />
+    <a href="https://www.labouseur.com/courses/compilers/"><strong>Class Information »</strong></a>
+    <br />
+    <br />
+  </p>
+</div>
+
 ## Self-Taught and COMPLETED 7/22/2024
 
 ### My goal
@@ -16,4 +26,3 @@
 ## LaTeX Writeups and Some Code Adjustments May be Required
 
 
-#### Class Materials Found Here: https://www.labouseur.com/courses/compilers/

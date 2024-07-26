@@ -9,14 +9,17 @@
     <p align="center">
   This project is split into 4 unique sub-projects, each a segment of the compiler that builds on the last segments. The final project is the FINAL complete version of the compiler. This setup was very intuitive and made the digestion of each aspect of the compiler easy and non-overwhelming. However, each project came with its own struggles and challenges which I will talk more in-depth about.
   </p>
-  <h3 align="center">Project Overview</h3> 
+  <h3 align="center">Project Overview and Limitations</h3> 
   <p align="center">
-  The Project Is Broken Down Into The Following 4 Sub-Projects...
+  Due to the complexity of a Compiler and the vast amount of differing ways in which we can write high-level language, it becomes necessary for the sake of realistic expectations to set limitations on ourselves for this project. These limitations will help us create an intuitive compiler that will be both amazing and practical in the sense that it can be reasonable created in a few months time. As such to create this perfect balance, Professor Labouseur restricted the acceptable high-level grammar that this compiler will allow for use. <a href="https://www.labouseur.com/courses/compilers/grammar.pdf"><Grammer List</strong></a>
 
   <h4 align="center">Project One: Lexical Analysis</h4> 
+  <p align="center">
+   
+  </p>
   <h4 align="center">Project Two: Parsing </h4> 
   <h4 align="center">Project Three: Semantic Analysis</h4> 
-  <h4 align="center">Project One: Code Generation</h4> 
+  <h4 align="center">Project Four: Code Generation</h4> 
   </p>
 </div>
 

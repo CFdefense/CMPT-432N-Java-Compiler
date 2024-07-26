@@ -13,14 +13,10 @@
   <p align="center">
   The Project Is Broken Down Into The Following 4 Sub-Projects...
 
-  <h4 align="center">"Project One: Lexical Analysis"</h4> 
-
-  ### Project Two: Parsing
-
-  ### Project Three: Semantic Analysis
-
-  ### Project Four: Code Generation
-   
+  <h4 align="center">Project One: Lexical Analysis</h4> 
+  <h4 align="center">Project Two: Parsing </h4> 
+  <h4 align="center">Project Three: Semantic Analysis</h4> 
+  <h4 align="center">Project One: Code Generation</h4> 
   </p>
 </div>
 

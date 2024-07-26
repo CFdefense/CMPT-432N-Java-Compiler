@@ -4,9 +4,8 @@
 <br />
  <h4 align="center">Project Information</h4>
  <p align="center">
-    p
+  I started and completed this project during my free time while interning at Avangrid Networks in the summer of 2024. My goal when starting this project was to gain a deeper knowledge and skill with Java through a large-scale and difficult project. This compiler is currently by far my largest project and has consumed many many hours of my life, however, as a result, I can say this project is the one I am most proud of. I created this functional 6502 microprocessor compiler through hours of headache, self-study, and determination. I want to give a big shout-out to Alan Labouseur who provided all the materials and study information I needed to climb the mountain that was this project free on <a href="https://www.labouseur.com/courses/compilers/"><strong>his website</strong>)</a>
     <br />
-    <a href="https://www.labouseur.com/courses/compilers/"><strong>Class Information »</strong></a>
     <br />
     <br />
   </p>

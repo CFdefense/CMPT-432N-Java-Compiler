@@ -10,7 +10,18 @@
   This project is split into 4 unique sub-projects, each a segment of the compiler that builds on the last segments. The final project is the FINAL complete version of the compiler. This setup was very intuitive and made the digestion of each aspect of the compiler easy and non-overwhelming. However, each project came with its own struggles and challenges which I will talk more in-depth about.
   </p>
   <h3 align="center">Project Overview</h3> 
-  
+  <p align="center">
+  The Project Is Broken Down Into The Following 4 Sub-Projects...
+
+  ### Project One: Lexical Analysis
+
+  ### Project Two: Parsing
+
+  ### Project Three: Semantic Analysis
+
+  ### Project Four: Code Generation
+   
+  </p>
 </div>
 
 ## Self-Taught and COMPLETED 7/22/2024

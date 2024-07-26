@@ -1,6 +1,6 @@
 <h3 align="center">Marist College 'Design of Compilers' Class by Professor Labouseur</h3> 
 
-## 6502 Microprocessor Compiler That Translates High-Level Code into Executable 6502 Microprocessor Machine Code
+<h3 align="center">6502 Microprocessor Compiler That Translates High-Level Code into Executable 6502 Microprocessor Machine Code</h3>  
 ## Self-Taught and COMPLETED 7/22/2024
 
 ### My goal

@@ -5,17 +5,18 @@
  <p align="center">
   I started and completed this project during my free time while interning at Avangrid Networks in the summer of 2024. My goal when starting this project was to gain a deeper knowledge and skill with Java through a large-scale and difficult project. This compiler is currently by far my largest project and has consumed many many hours of my life, however, as a result, I can say this project is the one I am most proud of. I created this functional 6502 microprocessor compiler through hours of headache, self-study, and determination. I want to give a big shout-out to Alan Labouseur who provided all of the materials and study information I needed to climb the mountain that was this project free of charge on <a href="https://www.labouseur.com/courses/compilers/"><strong>his website</strong></a>
  </p>
-  <h3 align="center">Getting Started</h3> 
-    <p align="center">
-  This project is split into 4 unique sub-projects, each a segment of the compiler that builds on the last segments. The final project is the FINAL complete version of the compiler. This setup was very intuitive and made the digestion of each aspect of the compiler easy and non-overwhelming. However, each project came with its own struggles and challenges which I will talk more in-depth about.
-  </p>
   <h3 align="center">Project Overview and Limitations</h3> 
   <p align="center">
   This Project is a 6502 Microprocessor Compiler, the 6502 microprocessor is an 8-bit microprocessor that was widely used in the late 1970s and 1980s. Developed by MOS Technology, it became one of the most popular CPUs for home computers, video game consoles, and embedded systems. The 6502 Microprocessor is most notably the processor used in the Atari 2600 and Nintendo NES. The purpose of a Compiler is to translate high-level language that is easy for developers to understand but hard for machines to understand into machine code that the machine (in our case the 6502 microprocessor) can better understands and execute. 
   <br />
   <br />
-   However, due to the complexity of a Compiler and the vast amount of differing ways in which we can write high-level language, it becomes necessary for the sake of realistic expectations to set limitations on ourselves for this project. These limitations will help us create an intuitive compiler that will be both amazing and practical in the sense that it can be reasonable created in a few months time. As such to create this perfect balance, Professor Labouseur restricted the acceptable high-level grammar that this compiler will allow for use. <a href="https://www.labouseur.com/courses/compilers/grammar.pdf"><strong>See Acceptable Grammer Here</strong></a>
-
+   This project is split into 4 unique sub-projects, each a segment of the compiler that builds on the last segments. The final project is the FINAL complete version of the compiler. This setup was very intuitive and made each aspect of the compiler easy to comprehend while still challenging to implement.
+   <br />
+   <br />
+   Due to the complexity of a Compiler and the vast amount of differing ways in which we can write high-level language, it becomes necessary for the sake of realistic expectations to set limitations on ourselves for this project. These limitations will help us create an intuitive compiler that will be both amazing and practical in the sense that it can be reasonable created in a few months time. To create this perfect balance, Professor Labouseur restricted the acceptable high-level grammar that this compiler will allow for use. <a href="https://www.labouseur.com/courses/compilers/grammar.pdf"><strong>See Acceptable Grammer Here</strong></a>
+  </p>
+  <h3 align="center">Project Overview and Limitations</h3> 
+  <p align="center">
   <h4 align="center">Project One: Lexical Analysis</h4> 
   <p align="center">
    

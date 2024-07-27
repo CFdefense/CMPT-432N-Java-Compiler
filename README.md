@@ -20,7 +20,7 @@ My goal when starting this project was to gain a deeper knowledge and skill with
   <p align="center">
   <h4 align="center">Project One: Lexical Analysis</h4> 
   <p align="center">
-   
+   <a href="https://www.labouseur.com/courses/compilers/project1.pdf">Project One</a> starts the compiler off with the lexer, the lexer's job is to run lexical analysis which is the first check our high-level language will have to pass. Lexical analysis involves checking every single character written in our high-level language. From there we will check if the 
   </p>
   <h4 align="center">Project Two: Parsing </h4> 
   <h4 align="center">Project Three: Semantic Analysis</h4> 
@@ -29,16 +29,6 @@ My goal when starting this project was to gain a deeper knowledge and skill with
 </div>
 
 ## Self-Taught and COMPLETED 7/22/2024
-
-### My goal
-##
-#### The Compiler is Broken Down Into Different Projects, Each Building on The Previous One
-
-#### Project 1: Lexical Analysis
-#### Project 2: Parser
-#### Project 3: Semantic Analysis
-#### Project 4: Generate Machine Code
-
 
 ## LaTeX Writeups and Some Code Adjustments May be Required
 

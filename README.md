@@ -76,7 +76,7 @@ My goal when starting this project was to gain a deeper knowledge and skill with
 </p>
 <br />
 <p align = "center">
- <strong>Step 4: Execute "run" followed by the assigned operation number. This will execute the stored machine code, in this case, the code printed 123 and then DONE</strong>
+ <strong>Step 4: Execute "run" followed by the assigned operation number. This will execute the stored machine code. In this case, the machine code printed 12 and then DONE</strong>
 </p>
    <p align="center">
   <img src="https://i.imgur.com/HpicYih.png" alt="img4" width="700" height="450">

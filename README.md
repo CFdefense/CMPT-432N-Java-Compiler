@@ -17,6 +17,7 @@ My goal when starting this project was to gain a deeper knowledge and skill with
    <br />
    Due to the complexity of a Compiler and the vast amount of differing ways in which we can write high-level language, it becomes necessary for the sake of realistic expectations to set limitations on ourselves for this project. These limitations will help us create an intuitive compiler that will be both amazing and practical in the sense that it can be reasonably created in a few months time. To create this perfect balance, Professor Labouseur restricted the acceptable high-level grammar that this compiler will allow for use. <a href="https://www.labouseur.com/courses/compilers/grammar.pdf"><strong>See Acceptable Grammer Here</strong></a>
   </p>
+  <br />
   <h3 align="center">Lets Dive Into The Compiler!</h3> 
   <h4 align="center">How to Execute</h4> 
   <p align="center">

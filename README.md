@@ -57,6 +57,18 @@ My goal when starting this project was to gain a deeper knowledge and skill with
    Begin by starting the operating system
    <br />
    <p align="center">
-  <img src="https://i.imgur.com/30aPL3R.png" alt="Logo" width="600" height="600">
+  <img src="https://i.imgur.com/30aPL3R.png" alt="img1" width="600" height="600">
+</p>
+<br />
+   <p align="center">
+  <img src="https://i.imgur.com/pJjjHxR.png" alt="img2" width="600" height="600">
+</p>
+<br />
+   <p align="center">
+  <img src="https://i.imgur.com/7BFEtXN.png" alt="img3" width="600" height="600">
+</p>
+<br />
+   <p align="center">
+  <img src="https://i.imgur.com/HpicYih.png" alt="img4" width="600" height="600">
 </p>
 <h4 align="center">LaTeX Writeups and Some Code Adjustments May be Required For Class Completion</h4>

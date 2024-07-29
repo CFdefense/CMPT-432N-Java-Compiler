@@ -21,7 +21,7 @@ My goal when starting this project was to gain a deeper knowledge and skill with
   <p align="center">
    For any of the sub-projects, executing is as simple as copying the full path of the testName.txt test file, running the project and pasting the path where prompted.
   <br />
-    ```sh
+   ```shell
   npm install npm@latest -g
   ```
   </p>

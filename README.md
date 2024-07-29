@@ -69,11 +69,15 @@ My goal when starting this project was to gain a deeper knowledge and skill with
 </p>
 <br />
 <p align = "center">
- <strong> Load the 256 bytes of machine code into the operating system's memory, you will be provided with a number that is assigned to that operation</strong>
+ <strong> Execute "load" to load the 256 bytes of machine code into the operating system's memory, you will be provided with a number that is assigned to that operation</strong>
+</p>
    <p align="center">
   <img src="https://i.imgur.com/7BFEtXN.png" alt="img3" width="700" height="450">
 </p>
 <br />
+<p align = "center">
+ <strong> Finally, execute "run" followed by the assigned operation number. This will execute the stored machine code, in this case, the code printed 123 and then DONE</strong>
+</p>
    <p align="center">
   <img src="https://i.imgur.com/HpicYih.png" alt="img4" width="700" height="450">
 </p>

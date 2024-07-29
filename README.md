@@ -57,6 +57,6 @@ My goal when starting this project was to gain a deeper knowledge and skill with
    Begin by starting the operating system
    <br />
    <p align="center">
-  <img src="images/logo.png" alt="Logo" width="200" height="200">
+  <img src="https://i.imgur.com/30aPL3R.png" alt="Logo" width="200" height="200">
 </p>
 <h4 align="center">LaTeX Writeups and Some Code Adjustments May be Required For Class Completion</h4>

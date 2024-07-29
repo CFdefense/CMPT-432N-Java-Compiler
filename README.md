@@ -21,10 +21,11 @@ My goal when starting this project was to gain a deeper knowledge and skill with
   <p align="center">
    For any of the sub-projects, executing is as simple as copying the full path of the testName.txt test file, running the project and pasting the path where prompted.
   <br />
-   ```shell
-  npm install npm@latest -g
-  ```
   </p>
+  ```shell
+  sd
+  ```
+  
   <h4 align="center">Project One: Lexical Analysis</h4> 
   <p align="center">
    <a href="https://www.labouseur.com/courses/compilers/project1.pdf">Project One</a> Starts the compiler off with the lexer, the lexer's job is to run lexical analysis which is the first check our high-level language will have to pass. Lexical analysis involves checking every single character written in our high-level language for the creation of a token stream. A token can be a word such as <strong>string</strong> or <strong>int</strong> or a character such as <strong>a</strong> or <strong>{</strong> Checking means to compare the words and characters in our high-level language to our acceptable grammar. This might seem easy, however, how can this be done effectively? and how will we differentiate between a character and a word? The solution to this question is the main challenge of this first project. This can be solved using regular expressions aka Regex. Regex is a powerful and efficient import that can be used for pattern recognition, ie it will recognize an <strong>I</strong> followed by an <strong>N</strong> and then a <strong>T</strong> as INT instead of each individual character. Using this tool we read through our imported high-level language and can form accurate tokens. Regex also has another great purpose in identifying bad characters, in such an event we can throw errors to the terminal for changes to be made in the high-level language. Following the completion of this project will we have a functioning lexer that can correctly convert high-level language into a stream of useful tokens, ignoring spaces and throwing errors for any unwanted symbols. We are now ready to move on to parsing.

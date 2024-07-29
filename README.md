@@ -21,8 +21,11 @@ My goal when starting this project was to gain a deeper knowledge and skill with
   <p align="center">
    For any of the sub-projects, executing is as simple as copying the full path of the testName.txt test file, running the project and pasting the path where prompted.
   <br />
+   Example
    <pre><code class="language-shell">
-  npm install npm@latest -g
+  PS C:\Users\You\EpicCompiler>
+   <br />
+  Enter File Input for Testing Lexer C:\Users\You\EpicCompiler\Project4\testfiles\testName.txt
   </code></pre>
   </p>
   <h4 align="center">Project One: Lexical Analysis</h4> 

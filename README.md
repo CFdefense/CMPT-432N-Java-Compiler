@@ -62,7 +62,7 @@ My goal when starting this project was to gain a deeper knowledge and skill with
 </p>
 <br />
 <p align = "center">
-<strong>Next copy ALL of the memory and replace it with the 256 bytes of generated machine code from the compiler</strong>
+<strong>Next delete ALL of the pre-saved memory and then paste the 256 bytes of generated machine code from the compiler</strong>
 </p>
    <p align="center">
   <img src="https://i.imgur.com/pJjjHxR.png" alt="img2" width="700" height="450">

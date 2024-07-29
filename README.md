@@ -45,5 +45,6 @@ My goal when starting this project was to gain a deeper knowledge and skill with
   </p>
   <br />
   <h4 align="center">Executing Machine Code in SvegOS</h4> 
-  
+  <p align="center">
+  Upon successful code generation, the compiler will display the 256-byte memory representation of your high-level language code. This memory is divided into three segments of memory, the code, the stack, and the heap. In order to execute the 6502 compiled code, we will need a 6502 operating system that can properly interpret and execute the op-codes we have generated in our 256-byte memory. For the sake of clarity, we will stick to <a href="https://www.labouseur.com/commondocs/operating-systems/SvegOS/public_html/index.html">SvegOS</a>. Sveg OS is an operating system created in alignment with Professor Labouseur's Operating Systems class, however, just about any 6502 Operating Systems should theoretically be able to execute our generated code. 
 <h4 align="center">LaTeX Writeups and Some Code Adjustments May be Required For Class Completion</h4>

@@ -61,12 +61,15 @@ My goal when starting this project was to gain a deeper knowledge and skill with
   <img src="https://i.imgur.com/30aPL3R.png" alt="img1" width="700" height="450">
 </p>
 <br />
-<br />
-<strong>Next copy ALL of the memory and replace it with the 256-bytes of generated machine code from the compiler</strong>
+<p align = "center">
+<strong>Next copy ALL of the memory and replace it with the 256 bytes of generated machine code from the compiler</strong>
+</p>
    <p align="center">
   <img src="https://i.imgur.com/pJjjHxR.png" alt="img2" width="700" height="450">
 </p>
 <br />
+<p align = "center">
+ <strong> Load the 256 bytes of machine code into the operating system's memory, you will be provided with a number that is assigned to that operation</strong>
    <p align="center">
   <img src="https://i.imgur.com/7BFEtXN.png" alt="img3" width="700" height="450">
 </p>

@@ -81,4 +81,5 @@ My goal when starting this project was to gain a deeper knowledge and skill with
    <p align="center">
   <img src="https://i.imgur.com/HpicYih.png" alt="img4" width="700" height="450">
 </p>
+<h4 align="center">Thanks For Reading</h4>
 <h4 align="center">LaTeX Writeups and Some Code Adjustments May be Required For Class Completion</h4>

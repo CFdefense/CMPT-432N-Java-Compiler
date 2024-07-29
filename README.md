@@ -62,7 +62,7 @@ My goal when starting this project was to gain a deeper knowledge and skill with
 </p>
 <br />
 <p align = "center">
-<strong>Next delete paste the compiled 256 bytes of code into the bottom right box</strong>
+<strong>Next paste the compiled 256 bytes of code into the bottom right box</strong>
 </p>
    <p align="center">
   <img src="https://i.imgur.com/pJjjHxR.png" alt="img2" width="700" height="450">

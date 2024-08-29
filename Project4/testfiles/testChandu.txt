@@ -1,0 +1,11 @@
+{
+    int a
+    a = 5
+    print(a)
+    a = 4 + a
+    print(a)
+    if(a == 9) {
+        print("success")
+    }
+}
+$

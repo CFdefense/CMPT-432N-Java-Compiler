@@ -15,3 +15,5 @@
         print("d")
     }
 }$
+
+/* same as simple_if3 */

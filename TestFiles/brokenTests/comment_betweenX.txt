@@ -1,6 +1,0 @@
-{
-    i/*COMMENT*/nt
-=/*COMMENT*/
-"hi"
-}
-$

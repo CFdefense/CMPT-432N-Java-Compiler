@@ -15,3 +15,5 @@
         print("d")
     }
 }$
+
+/* mem error storing and comparing to boolval not implemented */

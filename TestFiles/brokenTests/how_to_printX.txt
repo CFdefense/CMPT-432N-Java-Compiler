@@ -12,3 +12,5 @@
     c = "hi"
     print(c)
 }$
+
+/* printing straight nums not implemented */

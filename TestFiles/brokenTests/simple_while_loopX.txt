@@ -8,3 +8,5 @@
     boolean b
 }
 $
+
+/* same as equals */

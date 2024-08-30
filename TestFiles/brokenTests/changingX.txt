@@ -25,5 +25,8 @@
     if ("hi" == "hi") {
         print("hi is hi")
     }
-}$
+}
+$
 
+/* not correctly storing and comparing strings */
+/* note infinite parse of space if missing quotes */

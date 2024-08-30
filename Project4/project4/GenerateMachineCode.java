@@ -69,7 +69,7 @@ public class GenerateMachineCode {
         // Initialize true and false pointers
         this.truePointer = String.valueOf(String.format("%02X", 249));
         this.falsePointer = String.valueOf(String.format("%02X", 243));
-
+        
         // Initialize t2 and t1 pointers
         this.t2Pointer = String.valueOf(String.format("%02X", 255));
         this.t1Pointer = String.valueOf(String.format("%02X", 254));

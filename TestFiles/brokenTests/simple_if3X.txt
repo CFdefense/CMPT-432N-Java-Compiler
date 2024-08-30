@@ -17,3 +17,4 @@
 }$
 
 /* mem error storing and comparing to boolval not implemented */
+/* FOUND ERROR DUE TO temp address not being set to location of boolean look in code gen */

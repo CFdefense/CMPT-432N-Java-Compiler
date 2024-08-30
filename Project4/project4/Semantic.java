@@ -265,66 +265,40 @@ public class Semantic {
                     child.setScope(currScope);
                 }
                 
-                ArrayList<String> leftTypes = new ArrayList<>(); // ArrayList to hold all types of left node
-                ArrayList<String> rightTypes = new ArrayList<>(); // ArrayList to hold all types of right node
+                ArrayList<String> childrens = new ArrayList<>(); // ArrayList to hold all children of eq
+                
+                String typeFound = "";
+                String errorType = "";
 
-                // Must and can only have two sides of the ==/!= sign
-                Node leftSide = currEquals.get(0);
-                Node rightSide = currEquals.get(1);
+                boolean success = true;
+                
 
-                String leftType = "";
-                String rightType = "";
-
-                boolean leftSuccess = true;
-                boolean rightSuccess = true;
-
-                // Add all left types to array
-                for(Node child : leftSide.getChildren()) {
+                // Add all children to array
+                for(Node child : currEquals) {
                     String currType = checkType(child);
                     if(!currType.equalsIgnoreCase("")) {
-                        leftTypes.add(currentType);
+                        childrens.add(currType);
                     }
                 }
 
-                // Add all right types to array
-                for(Node child : rightSide.getChildren()) {
-                    String currType = checkType(child);
-                    if(!currType.equalsIgnoreCase("")) {
-                        rightTypes.add(currentType);
-                    }
-                }
-
-                // Check if all Types in Left Equal
-                for(int i = 0; i < leftTypes.size(); i++) {
+                // Check if all Types in are equal
+                for(int i = 0; i < childrens.size(); i++) {
                     if(i == 0) {
-                        leftType = leftTypes.get(i);
+                        typeFound = childrens.get(i);
                     } else {
-                        if(!leftType.equalsIgnoreCase(leftTypes.get(i))) {
-                            System.out.println("ERROR: TYPE MISMATCH - Expected [ " + leftType + " ] but found " + leftTypes.get(i));
-                            leftSuccess = false;
-                            this.errorCount++;
+                        if(!typeFound.equalsIgnoreCase(childrens.get(i))) {
+                            System.out.println("ERROR: TYPE MISMATCH - Expected [ " + typeFound + " ] but found " + childrens.get(i));
+                            success = false;
+                            errorType = childrens.get(i);
                             break;
                         }
                     }
                 }
 
-                // Check if all Types in Right Equal
-                for(int i = 0; i < rightTypes.size(); i++) {
-                    if(i == 0) {
-                        rightType = rightTypes.get(i);
-                    } else {
-                        if(!rightType.equalsIgnoreCase(rightTypes.get(i))) {
-                            System.out.println("ERROR: TYPE MISMATCH - Expected [ " + rightType + " ] but found " + rightTypes.get(i));
-                            rightSuccess = false;
-                            this.errorCount++;
-                            break;
-                        }
-                    }
-                }
                 
                 // Check if Both Sides are Equal
-                if(!leftSuccess || !rightSuccess) {
-                    System.out.println("ERROR: TYPE MISMATCH - [ " + leftType + " ] != [ " + rightType + " ]");
+                if(!success) {
+                    System.out.println("ERROR: TYPE MISMATCH - [ " + typeFound + " ] != [ " + errorType + " ]");
                     this.errorCount++;
                 }
                 break;

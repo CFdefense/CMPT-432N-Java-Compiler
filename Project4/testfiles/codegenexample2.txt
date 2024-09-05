@@ -1,6 +1,8 @@
-{
-    string n
-    n = "alan"
-    print(n)
-}
-$
+Partition the hard drive
+
+Setup Arch
+
+HyprLand
+waybar
+woofie
+kitty

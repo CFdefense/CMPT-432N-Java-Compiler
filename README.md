@@ -1,4 +1,8 @@
 <h2 align="center">6502 Microprocessor Compiler That Translates High-Level Code into Executable 6502 Microprocessor Machine Code</h3>  
+<h3 align="center">Project Demo</h4>
+<div align="center">
+    <img src="https://github.com/CFdefense/CFdefense.github.io/blob/main/public/media/projects/compiler.gif?raw=true" alt="Description of the GIF" width="750">
+</div>
  <h3 align="center">Project Information</h4>
  <p align="center">
   I started and completed this project during my free time while interning at Avangrid Networks in the summer of 2024. During my freshman year, my upperclassmen friends could not stop talking about this class and the hardships it brought them. As such I thought I would give it my best and try to push myself to complete the class independently of any teaching. Originally this class is taught during the junior or senior year of a CS degree at Marist College. It is titled 'Design of Compilers' and is taught in person by Professor Labouseur. I want to give a big shout-out to Alan Labouseur who provided all of the materials and study information I needed to climb the mountain that was this project free of charge on <a href="https://www.labouseur.com/courses/compilers/"><strong>his website</strong></a>

@@ -1,6 +1,6 @@
 Remaining identified issues within our scope
 
-1. Missing quotes leads to infinite parse
+1. Missing quotes leads to infinite parse -> have bool check for multiline quotes
 2. Dual String Comparison
 3. Infinite loops
 4. Printing Straight nums

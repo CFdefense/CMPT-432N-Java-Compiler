@@ -189,10 +189,14 @@ public class GenerateMachineCode {
                 foundCase = true; // Update so we dont continue down the tree
                 // Create Bytes From FoundTemp Location of First Child
                 if(firstChildType.charAt(0) != '\"') {
-                    String tempByte = getTempAddress(firstChildType, firstChildScope).substring(0, 2);
-                    String secondByte = getTempAddress(firstChildType, firstChildScope).substring(2, 4);
+                    if(firstChildType.equalsIgnoreCase("true") || firstChildType.equalsIgnoreCase("false")) {
+                        printBoolop(firstChildType);
+                    } else {
+                        String tempByte = getTempAddress(firstChildType, firstChildScope).substring(0, 2);
+                        String secondByte = getTempAddress(firstChildType, firstChildScope).substring(2, 4);
     
-                    printStatement(firstChildType, firstChildScope, tempByte, secondByte);
+                        printStatement(firstChildType, firstChildScope, tempByte, secondByte);
+                    }
                 } else {
                     // Quotes Case 
                     printStatement(firstChildType, 0, "00", "00");
@@ -221,20 +225,20 @@ public class GenerateMachineCode {
                 Node currChild = children.get(i); // Get Curr Child starting at second
 
                 // Check if variable has been declared and memory can be optimized
-                if(tryOptimization(firstTempByte, secondTempByte) == true) {
+                /*if(tryOptimization(firstTempByte, secondTempByte) == true) {
                     // move codepointer to override previous declaration
                     this.myCodePointer -= 5;
                 }
-
+                */
                 // Depending on found dig or not do the following
                 if(isDigit(currChild.getType())) {
                     // LDA Const Value
                     LDAConst("0" +(currChild.getType()));
                 } else if(currChild.getType().equalsIgnoreCase("true")) {
-                    // Bool Op True -> LDA with 01
+                    // Bool Op True -> LDA with true pointer
                     LDAConst(this.truePointer);
                 } else if(currChild.getType().equalsIgnoreCase("false")) {
-                    // Bool Op False -> LDA with 00
+                    // Bool Op False -> LDA with false pointer
                     LDAConst(this.falsePointer);
                 } else {
                     LDAMemory(currChild, firstTempByte, secondTempByte, false); // Its an ID
@@ -407,6 +411,21 @@ public class GenerateMachineCode {
 
         // Backpatch Jump for Logged Jump Number
         updateJumpAddress(currIfJump, this.myCodePointer - logPointer);
+    }
+
+    // Method For Generating Machine Code for Printing Straight BoolVals
+    public void printBoolop(String boolType) {
+        // set bool pointer to be true or false pointer depending on booltype
+        String boolPointer = boolType.equalsIgnoreCase("true") ? this.truePointer : this.falsePointer;
+
+        // Load Y with bool pointer WHY DOES LOADING W CONST WORK BUT LOADING W MEM DOESNT?
+        LDYConst(boolPointer);
+
+        // Load X with 02 to tell sys call to print string there
+        LDXConst("2");
+
+        // Make SYS Call
+        SYSCall();
     }
 
     // Method For Generating Machine Code For Print Statements
@@ -851,6 +870,9 @@ public class GenerateMachineCode {
         this.currTemp++;
     }
 
+    // Method to Store Bool Flag in temp storage -> for bool comparison fix
+
+
     // Method to Store Existing Static Var in Memory
     public void STAEMemory(String firstByte, String secondByte) {
         // STA Temporary Location
@@ -911,6 +933,7 @@ public class GenerateMachineCode {
         } else {
             // Heap Memory Address
             this.myMemory[this.myCodePointer++] = firstByte;
+            this.myMemory[this.myCodePointer++] = secondByte; // temp change might break 
         }
     }
 

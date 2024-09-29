@@ -1,8 +1,0 @@
-Partition the hard drive
-
-Setup Arch
-
-HyprLand
-waybar
-woofie
-kitty

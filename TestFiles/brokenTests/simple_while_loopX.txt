@@ -1,12 +1,10 @@
 {
     boolean a
     a = true
-    while (a == true) {
+    if (a == true) {
         print(a)
     }
 
-    boolean b
+    print(a)
 }
 $
-
-/* same as equals */

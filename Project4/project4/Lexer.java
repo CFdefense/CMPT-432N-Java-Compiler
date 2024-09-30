@@ -197,7 +197,7 @@ public class Lexer {
                             } else if(inQuotes) {
                                 System.out.println("ERROR PROGRAM ENDED IN A QUOTE - MISSING END QUOTE");
                                 System.out.println("NO EOP DETECTED");
-                                this.warningCount++;
+                                this.errorCount++;
                             } else {
                                 // Create Token if the $ does not exist in a comment or quote
                                 Token newSymbolToken = new Token(tokenID, myMatch, lineNumber + 1);

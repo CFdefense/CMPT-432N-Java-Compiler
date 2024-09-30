@@ -1,5 +1,4 @@
 Remaining identified issues within our scope
 
-1. Missing quotes leads to infinite parse of "space"-> have bool check for multiline quotes
-2. Dual String Comparison
-3. Comparing boolvals -> temp address not being updated to boolval location
+1. String to String/String to Var Comparisons
+2. Comparing 1 boolval case if a = false if(a != false) == true 

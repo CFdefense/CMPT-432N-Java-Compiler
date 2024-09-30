@@ -190,8 +190,13 @@ public class GenerateMachineCode {
                 // Create Bytes From FoundTemp Location of First Child
                 if(firstChildType.charAt(0) != '\"') {
                     if(firstChildType.equalsIgnoreCase("true") || firstChildType.equalsIgnoreCase("false")) {
+                        // case for straight bool printing
                         printBoolop(firstChildType);
+                    } else if(isInteger(firstChildType) == true) {
+                        // case for straight num printing
+                        printNum(firstChildType);
                     } else {
+                        // use id/heap temp address
                         String tempByte = getTempAddress(firstChildType, firstChildScope).substring(0, 2);
                         String secondByte = getTempAddress(firstChildType, firstChildScope).substring(2, 4);
     
@@ -426,6 +431,17 @@ public class GenerateMachineCode {
         SYSCall();
     }
 
+    // Method to Print Straight Nums
+    public void printNum(String firstChildType) {
+        // load y with const prefixing num w 0
+        LDYConst("0" + firstChildType);
+
+        // load x with 01
+        LDXConst("1");
+
+        // sys call
+        SYSCall();
+    }
     // Method For Generating Machine Code For Print Statements
     public void printStatement(String firstChildType, int firstChildScope, String firstTempByte, String secondTempByte) {
         // If the first has a quote we know were looking at a charlist
@@ -697,6 +713,16 @@ public class GenerateMachineCode {
                 break;
         }
     }
+    // Method to check if a string can be an int
+    public static boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 
     // Method to handle Expr Overload ie assignments such as a = 1 + 2 + a
     public void handleExprOverload(ArrayList<Node> children, int varScope) {

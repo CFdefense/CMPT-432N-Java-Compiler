@@ -4,5 +4,3 @@
     }
 }
 $
-
-/* Not correctly looping */

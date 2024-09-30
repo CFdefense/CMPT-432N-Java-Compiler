@@ -310,8 +310,9 @@ public class GenerateMachineCode {
 
         // Update Previous Jump to Jump here
         if(comparisonType.equalsIgnoreCase("isNotEq")) {
-            updateJumpAddress(currJumpOne, this.myCodePointer - startingPosOne);
+            
         }
+        updateJumpAddress(currJumpOne, this.myCodePointer - startingPosOne);
 
         // Branch DNE 
         BNE("05");

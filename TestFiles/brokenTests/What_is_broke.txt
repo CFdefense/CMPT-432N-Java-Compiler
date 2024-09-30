@@ -2,6 +2,6 @@ Remaining identified issues within our scope
 
 1. Missing quotes leads to infinite parse -> have bool check for multiline quotes
 2. Dual String Comparison
-3. Infinite loops
-4. Printing Straight nums
-5. Comparing boolvals -> temp address not being updated to boolval location
+3. Printing Straight nums
+4. Comparing boolvals -> temp address not being updated to boolval location
+5. looking for new program if space after EOP

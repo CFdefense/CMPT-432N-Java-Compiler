@@ -17,7 +17,7 @@ public class Token {
     // Full Constructor
     public Token(String newType, String newLexeme, int newLine) {
         this.myType = newType;
-        this.myLexeme =newLexeme;
+        this.myLexeme = newLexeme;
         this.myLine = newLine;
     }
 

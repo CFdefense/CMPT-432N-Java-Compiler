@@ -26,7 +26,7 @@ public class Lexer {
     private boolean foundEnd; // boolean to determine if weve hit an EOP
     private boolean foundNew; // boolean to determine if were starting a new program
     private Parser myParser; // Parser instance to begin next step of compiling
-    private int myProgramNumber;
+    private int myProgramNumber; // Hold Program # being parsed
     
     //! Begin Lexer Construction and Manipulation
 
@@ -129,15 +129,13 @@ public class Lexer {
             }
 
             // Continue while we have a match
-            while(match.find()) { // finds next match
-
+            while(match.find()) { // finds next match                System.out.println(match.find());
                 // Define the match and update our last match
                 String myMatch = match.group();
                 lastMatch = myMatch;
 
                 // The Match is a KEYWORD
-                if(match.group().matches(keywords) && !inComment && !inQuotes) {
-                    
+                if(match.group().matches(keywords) && !inComment && !inQuotes)  {
                     // Determine which keyword has been matched
                     switch (myMatch) {
                         case "print":
@@ -362,11 +360,21 @@ public class Lexer {
                 myParser.parseProgram();
             }
 
-            // save to total tokens before reset
-            this.myTotalTokens.add(this.myTokens);
+           // Save tokens to total tokens list before resetting
+        this.myTotalTokens.add(this.myTokens);
 
-            // Reset Lexer for Next Program
-            this.clearLexer();
+        // Reset Lexer for the Next Program
+        this.clearLexer();
+
+        // Check if there's another program to process
+        if (!hasNextProgram(lineNumber)) {
+            System.out.println("No more programs found.");
+            return; // Exit the lexer if no next program is found
+        } else {
+            // Reset necessary flags for the next program
+            this.foundNew = true;
+            this.foundEnd = false;
+        }
         } 
     }
 
@@ -407,12 +415,35 @@ public class Lexer {
             myParser.parseProgram();
         }
 
-        // Save Tokens
-        myTotalTokens.add(myTokens);
+        // Save tokens to total tokens list before resetting
+        this.myTotalTokens.add(this.myTokens);
 
-        // Reset Lexer for Next Program
+        // Reset Lexer for the Next Program
         this.clearLexer();
+
+        // Check if there's another program to process
+        if (!hasNextProgram(lineNumber)) {
+            System.out.println("No more programs found.");
+            return; // Exit the lexer if no next program is found
+        } else {
+            // Reset necessary flags for the next program
+            this.foundNew = true;
+            this.foundEnd = false;
+        }
     }   
+    }
+
+    public boolean hasNextProgram(int currentLine) {
+        // Start scanning from the current line number onwards
+        for (int i = currentLine; i < fileLines.size(); i++) {
+            String line = fileLines.get(i);
+            // Check if this line contains an opening brace {
+            if (line.contains("{")) {
+                return true; // There's another program
+            }
+        }
+        // If no more { are found, return false
+        return false;
     }
 }
 //! End of Lexical Anaylsis (Scanner)

@@ -308,10 +308,7 @@ public class GenerateMachineCode {
         // Compare X register and End Pointr
         CPXMemory("00", "00", true);
 
-        // Update Previous Jump to Jump here
-        if(comparisonType.equalsIgnoreCase("isNotEq")) {
-            
-        }
+        // Update Jump One to Jump here
         updateJumpAddress(currJumpOne, this.myCodePointer - startingPosOne);
 
         // Branch DNE 

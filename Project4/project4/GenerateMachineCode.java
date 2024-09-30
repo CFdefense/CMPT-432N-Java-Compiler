@@ -241,10 +241,10 @@ public class GenerateMachineCode {
                     LDAConst("0" +(currChild.getType()));
                 } else if(currChild.getType().equalsIgnoreCase("true")) {
                     // Bool Op True -> LDA with true pointer
-                    LDAConst(this.truePointer);
+                    LDAConst("01");
                 } else if(currChild.getType().equalsIgnoreCase("false")) {
                     // Bool Op False -> LDA with false pointer
-                    LDAConst(this.falsePointer);
+                    LDAConst("00");
                 } else {
                     LDAMemory(currChild, firstTempByte, secondTempByte, false); // Its an ID
                 }
@@ -377,6 +377,7 @@ public class GenerateMachineCode {
         // Get Type of Comparison Being Made
         String comparisonType = children.get(0).getType();
 
+        // load respective registers w comparing values
         loadCompareX(children);
 
         // If Were looking at a != Comparison 
@@ -395,10 +396,11 @@ public class GenerateMachineCode {
 
             // Store Accumulator at End Pointer
             STAEMemory(t2Pointer, "00");
-
-            // Compare X register and End Pointr
-            CPXMemory("00", "00", true);
         }
+        
+        // Compare X register and End Pointr
+        CPXMemory("00", "00", true);
+
         
         // Log current Jump Number
         int currIfJump = currJump;
@@ -655,6 +657,8 @@ public class GenerateMachineCode {
 
                 break;
             case "BOOLVAL":
+                // unique bool val case
+
             case "STRING":
                 // Write to Heap and Load X Register w Location
                 boolean result = writeToHeap(ifChildren.get(0).getType());
@@ -697,7 +701,15 @@ public class GenerateMachineCode {
                 CPXMemory(this.myMemory[this.myCodePointer - 1], this.myMemory[this.myCodePointer - 2], false);
 
                 break;
-            case "BOOLOP":
+            case "BOOLVAL":
+                // load acummulator with corresponding value
+                String loadValue = ifChildren.get(1).getType().equalsIgnoreCase("true") ? "01" : "00";
+                LDAConst(loadValue);
+
+                // store at FF t1 location
+                STAEMemory(this.t2Pointer, "00");
+
+                break;
             case "STRING":
                 // Write to Heap and Compare X With Second Child
                 boolean result = writeToHeap(ifChildren.get(1).getType());
@@ -709,7 +721,7 @@ public class GenerateMachineCode {
                     this.myHeapOverflow = true;
                 }
                 // Compare Contents of X With Second Child
-                CPXMemory(String.format("%02X", myHeapPointer), "00", false); // Set 00 Flag to Only Use First Byte
+                CPXMemory(String.format("%02X", myHeapPointer), "00", true); // Set 00 Flag to Only Use First Byte
                 break;
         }
     }

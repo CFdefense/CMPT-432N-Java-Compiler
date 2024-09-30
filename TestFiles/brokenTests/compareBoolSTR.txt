@@ -1,0 +1,21 @@
+{
+    int a
+    a = 2
+    if(a == 2) {
+        print("yes")
+    }
+}
+$
+
+/* bool case broken
+A9 00 8D 15 00 A9 F9 8D 15 
+00 AE 15 00 D0 05 A2 02 A0 
+EF FF 00 00 00 00 00 00 00 
+*/
+
+/* int case - working
+A9 00 8D 1D 00 A9 02 8D 1D 
+00 AE 1D 00 A9 02 8D FE 00 
+EC FE 00 D0 05 A2 02 A0 EF 
+FF 00 00 00 00 00 00 00 00 
+*/

@@ -1,0 +1,10 @@
+{
+ string a
+ string b
+ a = "hi"
+ b = a
+ if(a != b) {
+    print("yippie")
+ }
+}
+$

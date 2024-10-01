@@ -397,9 +397,6 @@ public class GenerateMachineCode {
             // Store Accumulator at End Pointer
             STAEMemory(t2Pointer, "00");
         }
-        
-        // Compare X register and End Pointr
-        CPXMemory("00", "00", true);
 
         
         // Log current Jump Number
@@ -657,7 +654,7 @@ public class GenerateMachineCode {
 
                 break;
             case "BOOLVAL":
-                // unique bool val case
+                // unique bool val case -> needed if true == some var
 
             case "STRING":
                 // Write to Heap and Load X Register w Location
@@ -709,6 +706,9 @@ public class GenerateMachineCode {
                 // store at FF t1 location
                 STAEMemory(this.t2Pointer, "00");
 
+                // Compare X register and End Pointer -> needed for one test case but not for string comparison
+                CPXMemory("00", "00", true);
+                
                 break;
             case "STRING":
                 // Write to Heap and Compare X With Second Child

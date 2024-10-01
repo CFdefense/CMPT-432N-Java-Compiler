@@ -1,4 +1,6 @@
 Remaining identified issues within our scope
 
-1. String to String/String to Var Comparisons
-2. Comparing 1 boolval case if a = false if(a != false) == true 
+1. != is broken thats it
+
+Out of scope
+1. printing 1 + 1 equations etc

@@ -1,7 +1,7 @@
 {
     boolean a
     a = false
-    if(a != false) {
+    if(a == false) {
         print("yes")
     }
 }
